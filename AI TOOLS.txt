@@ -1,0 +1,51 @@
+CHATBOTS -
+
+Chatgpt 
+Gemini
+Claude
+
+Research & Summaries
+ 
+Perplexity
+Notebook LM
+
+Image Generation
+
+Midjourney 
+NanoBanana
+Higgsfield
+
+Video Generation 
+ 
+Veo 3
+Sora 2
+Kling 
+Higgsfield 
+
+Voice & Audio 
+
+ElevenLabs 
+Suno
+
+SEO 
+
+Semrush 
+Hostinger 
+
+Coding & Development
+
+Cursor 
+replit 
+Lovable 
+Emergent 
+Hostinger 
+
+Automations & Ai Agents 
+
+N8N
+Make 
+
+Presentations & Documents 
+
+Gamma 
+Kimi Ai 
