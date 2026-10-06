@@ -181,131 +181,42 @@
       </header>
 
       <!-- ══════════════════════════════════
-           DASHBOARD
+           DASHBOARD (PERSONAL WELLNESS HOME)
       ══════════════════════════════════ -->
       <section id="section-dashboard" class="page-section active">
-        <div class="page-header">
-          <div>
-            <h2 class="page-title" id="dashboard-greeting">Your Wellness Overview</h2>
-            <p class="page-subtitle">Track your mental health journey in real time.</p>
+        <!-- 1. Emotional Anchor: WALL·E Companion Sanctuary Hero -->
+        <div class="dashboard-sanctuary-hero motion-reveal">
+          <div class="sanctuary-character-col">
+            <div class="sanctuary-avatar-stage">
+              <div class="sanctuary-aura" id="sanctuary-aura"></div>
+              <div class="sanctuary-walle" id="sanctuary-walle">🤖</div>
+              <div class="sanctuary-lamp" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="sanctuary-welcome-col">
+            <div class="sanctuary-badge-row">
+              <span class="sanctuary-status-pill">✦ Space Companion Online</span>
+              <span class="sanctuary-date" id="sanctuary-live-date">Today</span>
+            </div>
+            <h2 class="sanctuary-title" id="dashboard-greeting">Welcome home, traveler.</h2>
+            <p class="sanctuary-thought" id="sanctuary-thought">"Take a slow breath. Your thoughts have a quiet place to land here with me."</p>
+            <div class="sanctuary-actions-row">
+              <button class="btn-primary" onclick="WallEMomentSystem.openPicker()">
+                <span>✦</span> A Moment with WALL·E
+              </button>
+              <button class="btn-ghost" onclick="AppController.navigate('mood')">
+                <span>◉</span> Check In Emotion
+              </button>
+              <button class="btn-ghost" onclick="MemoryGarden.openAddModal()">
+                <span>🌱</span> Plant Win
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Wellness Score Hero -->
-        <div class="ws-hero card glass-panel motion-reveal">
-          <div class="ws-hero-ring-side">
-            <p class="ws-ring-label">WELLNESS SCORE</p>
-            <div class="ws-ring-container">
-              <svg class="ws-ring-svg" viewBox="0 0 120 120">
-                <defs>
-                  <linearGradient id="wsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="var(--c-emerald)"/>
-                    <stop offset="100%" stop-color="var(--c-violet)"/>
-                  </linearGradient>
-                  <filter id="wsGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="3" result="blur"/>
-                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                  </filter>
-                </defs>
-                <circle class="ws-ring-track" cx="60" cy="60" r="50"/>
-                <circle class="ws-ring-progress" id="ws-ring-fill" cx="60" cy="60" r="50"
-                        stroke-dasharray="314" stroke-dashoffset="314" stroke="url(#wsGrad)"/>
-              </svg>
-              <div class="ws-ring-center">
-                <span class="ws-ring-num" id="ws-score-num">—</span>
-                <span class="ws-ring-pct">%</span>
-              </div>
-            </div>
-            <div class="ws-status-chip" id="ws-status-badge">Calculating…</div>
-          </div>
-
-          <div class="ws-hero-bars-side">
-            <p class="ws-bars-title">Score Breakdown</p>
-            <div class="ws-bars-list">
-              <div class="ws-bar-row">
-                <span class="ws-bar-lbl">😊 Mood</span>
-                <div class="ws-bar-track"><div class="ws-bar-fill c-emerald" id="wb-mood"></div></div>
-                <span class="ws-bar-val" id="wb-mood-val">—%</span>
-              </div>
-              <div class="ws-bar-row">
-                <span class="ws-bar-lbl">✅ Habits</span>
-                <div class="ws-bar-track"><div class="ws-bar-fill c-sky" id="wb-habit"></div></div>
-                <span class="ws-bar-val" id="wb-habit-val">—%</span>
-              </div>
-              <div class="ws-bar-row">
-                <span class="ws-bar-lbl">📓 Journal</span>
-                <div class="ws-bar-track"><div class="ws-bar-fill c-amber" id="wb-journal"></div></div>
-                <span class="ws-bar-val" id="wb-journal-val">—%</span>
-              </div>
-              <div class="ws-bar-row">
-                <span class="ws-bar-lbl">💬 Chat</span>
-                <div class="ws-bar-track"><div class="ws-bar-fill c-violet" id="wb-chat"></div></div>
-                <span class="ws-bar-val" id="wb-chat-val">—%</span>
-              </div>
-            </div>
-            <p class="ws-tip" id="ws-tip"></p>
-          </div>
-        </div>
-
-        <!-- Stats Row -->
-        <div class="stats-row motion-reveal">
-          <a href="#section-mood" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('mood')">
-            <div class="stat-tile-icon">🌤</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Today's Mood</p>
-              <p class="stat-tile-value" id="stat-today-mood">—</p>
-            </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
-          <a href="#section-habits" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('habits')">
-            <div class="stat-tile-icon">🔥</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Habit Streak</p>
-              <p class="stat-tile-value" id="stat-streak">0 days</p>
-            </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
-          <a href="#section-journal" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('journal')">
-            <div class="stat-tile-icon">📓</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Journal Entries</p>
-              <p class="stat-tile-value" id="stat-journal-count">0</p>
-            </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
-          <a href="#section-habits" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('habits')">
-            <div class="stat-tile-icon">✅</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Habits Today</p>
-              <p class="stat-tile-value" id="stat-habits-today">0/0</p>
-            </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-duo motion-reveal">
-          <div class="card chart-card glass-panel">
-            <div class="chart-card-head">
-              <h3 class="chart-card-title">Mood Trend (7 Days)</h3>
-              <span class="chart-trend-chip" id="mood-trend-badge"></span>
-            </div>
-            <div class="chart-body"><canvas id="moodTrendChart"></canvas></div>
-          </div>
-          <div class="card chart-card glass-panel">
-            <h3 class="chart-card-title">Mood Distribution</h3>
-            <div class="chart-body"><canvas id="moodDistChart"></canvas></div>
-          </div>
-        </div>
-
-        <div class="card chart-card mt-4 glass-panel">
-          <h3 class="chart-card-title">Weekly Habit Completion</h3>
-          <div class="chart-body-wide"><canvas id="habitChart"></canvas></div>
-        </div>
-
-        <!-- Dashboard Cohesive Wellness Showcase: Mental Weather & Tiny Wins Constellation -->
-        <div class="dashboard-wellness-showcase motion-reveal mt-4">
-          <!-- Mental Weather Card -->
+        <!-- 2. Primary Atmospheric State: Mental Weather & Tiny Wins (Balanced Living System) -->
+        <div class="dashboard-atmosphere-grid motion-reveal mt-4">
+          <!-- Mental Weather Showcase -->
           <div class="card weather-card glass-panel" id="dashboard-weather-card">
             <div class="weather-card-head">
               <div>
@@ -326,7 +237,7 @@
             </div>
           </div>
 
-          <!-- Tiny Wins Constellation Card -->
+          <!-- Tiny Wins Constellation -->
           <div class="card constellation-card glass-panel" id="dashboard-constellation-card">
             <div class="constellation-head">
               <div>
@@ -359,6 +270,126 @@
               <span class="star-detail-icon" id="star-detail-icon">✨</span>
               <span class="star-detail-text" id="star-detail-text">Tap any star to see what moment created it.</span>
             </div>
+          </div>
+        </div>
+
+        <!-- 3. Living Pulse & Rhythm (Calm Metrics Row) -->
+        <div class="stats-row motion-reveal mt-4">
+          <a href="#section-mood" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('mood')">
+            <div class="stat-tile-icon">🌤</div>
+            <div class="stat-tile-body">
+              <p class="stat-tile-label">Current Emotion</p>
+              <p class="stat-tile-value" id="stat-today-mood">—</p>
+            </div>
+            <span class="stat-tile-arrow">›</span>
+          </a>
+          <a href="#section-habits" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('habits')">
+            <div class="stat-tile-icon">🔥</div>
+            <div class="stat-tile-body">
+              <p class="stat-tile-label">Habit Momentum</p>
+              <p class="stat-tile-value" id="stat-streak">0 days</p>
+            </div>
+            <span class="stat-tile-arrow">›</span>
+          </a>
+          <a href="#section-journal" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('journal')">
+            <div class="stat-tile-icon">📓</div>
+            <div class="stat-tile-body">
+              <p class="stat-tile-label">Reflections</p>
+              <p class="stat-tile-value" id="stat-journal-count">0</p>
+            </div>
+            <span class="stat-tile-arrow">›</span>
+          </a>
+          <a href="#section-garden" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('garden')">
+            <div class="stat-tile-icon">🌱</div>
+            <div class="stat-tile-body">
+              <p class="stat-tile-label">Living Garden</p>
+              <p class="stat-tile-value" id="stat-garden-blooms">0 blooms</p>
+            </div>
+            <span class="stat-tile-arrow">›</span>
+          </a>
+        </div>
+
+        <!-- 4. Personal Wellness Progress & Score -->
+        <div class="ws-hero card glass-panel motion-reveal mt-4">
+          <div class="ws-hero-ring-side">
+            <p class="ws-ring-label">WELLNESS SCORE</p>
+            <div class="ws-ring-container">
+              <svg class="ws-ring-svg" viewBox="0 0 120 120">
+                <defs>
+                  <linearGradient id="wsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="var(--c-emerald)"/>
+                    <stop offset="100%" stop-color="var(--c-violet)"/>
+                  </linearGradient>
+                  <filter id="wsGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                  </filter>
+                </defs>
+                <circle class="ws-ring-track" cx="60" cy="60" r="50"/>
+                <circle class="ws-ring-progress" id="ws-ring-fill" cx="60" cy="60" r="50"
+                        stroke-dasharray="314" stroke-dashoffset="314" stroke="url(#wsGrad)"/>
+              </svg>
+              <div class="ws-ring-center">
+                <span class="ws-ring-num" id="ws-score-num">—</span>
+                <span class="ws-ring-pct">%</span>
+              </div>
+            </div>
+            <div class="ws-status-chip" id="ws-status-badge">Calculating…</div>
+          </div>
+
+          <div class="ws-hero-bars-side">
+            <p class="ws-bars-title">Harmony Breakdown</p>
+            <div class="ws-bars-list">
+              <div class="ws-bar-row">
+                <span class="ws-bar-lbl">😊 Mood</span>
+                <div class="ws-bar-track"><div class="ws-bar-fill c-emerald" id="wb-mood"></div></div>
+                <span class="ws-bar-val" id="wb-mood-val">—%</span>
+              </div>
+              <div class="ws-bar-row">
+                <span class="ws-bar-lbl">✅ Habits</span>
+                <div class="ws-bar-track"><div class="ws-bar-fill c-sky" id="wb-habit"></div></div>
+                <span class="ws-bar-val" id="wb-habit-val">—%</span>
+              </div>
+              <div class="ws-bar-row">
+                <span class="ws-bar-lbl">📓 Journal</span>
+                <div class="ws-bar-track"><div class="ws-bar-fill c-amber" id="wb-journal"></div></div>
+                <span class="ws-bar-val" id="wb-journal-val">—%</span>
+              </div>
+              <div class="ws-bar-row">
+                <span class="ws-bar-lbl">💬 Chat</span>
+                <div class="ws-bar-track"><div class="ws-bar-fill c-violet" id="wb-chat"></div></div>
+                <span class="ws-bar-val" id="wb-chat-val">—%</span>
+              </div>
+            </div>
+            <p class="ws-tip" id="ws-tip"></p>
+          </div>
+        </div>
+
+        <!-- 5. Secondary Analytics (Lower Hierarchy Section) -->
+        <div class="dashboard-analytics-section motion-reveal mt-4">
+          <div class="dashboard-analytics-header">
+            <div>
+              <h3 class="section-subheading">Deeper Trends &amp; Patterns</h3>
+              <p class="section-subcaption">Explore how your emotional health shifts over time.</p>
+            </div>
+          </div>
+          <div class="charts-duo mt-4">
+            <div class="card chart-card glass-panel">
+              <div class="chart-card-head">
+                <h3 class="chart-card-title">Mood Trend (7 Days)</h3>
+                <span class="chart-trend-chip" id="mood-trend-badge"></span>
+              </div>
+              <div class="chart-body"><canvas id="moodTrendChart"></canvas></div>
+            </div>
+            <div class="card chart-card glass-panel">
+              <h3 class="chart-card-title">Mood Distribution</h3>
+              <div class="chart-body"><canvas id="moodDistChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card chart-card mt-4 glass-panel">
+            <h3 class="chart-card-title">Weekly Habit Completion</h3>
+            <div class="chart-body-wide"><canvas id="habitChart"></canvas></div>
           </div>
         </div>
       </section>

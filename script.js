@@ -770,6 +770,29 @@ const Analytics = {
     }
     MotionSystem.count(_$('stat-streak'),streak,n=>`${n} day${n!==1?'s':''}`);
 
+    /* Living Garden Count */
+    const gardenCount = (typeof MemoryGarden !== 'undefined' && MemoryGarden.get) ? MemoryGarden.get().length : 0;
+    MotionSystem.count(_$('stat-garden-blooms'), gardenCount, n => `${n} bloom${n !== 1 ? 's' : ''}`);
+
+    /* Dashboard live date & sanctuary thought */
+    const dateEl = _$('sanctuary-live-date');
+    if (dateEl) {
+      dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+
+    const thoughtEl = _$('sanctuary-thought');
+    if (thoughtEl) {
+      if (todayMood && (todayMood.mood === 'Sad' || todayMood.mood === 'Stressed')) {
+        thoughtEl.textContent = `"I'm right here beside you. You don't have to carry everything all at once."`;
+      } else if (todayMood && todayMood.mood === 'Happy') {
+        thoughtEl.textContent = `"Your warmth reaches across the stars today. Hold onto this glowing moment."`;
+      } else if (todayMood && todayMood.mood === 'Calm') {
+        thoughtEl.textContent = `"Steady and peaceful like a quiet orbit. Keep honoring your inner stillness."`;
+      } else {
+        thoughtEl.textContent = `"Take a slow breath. Your thoughts have a quiet place to land here with me."`;
+      }
+    }
+
     /* Dashboard greeting */
     const hr   = new Date().getHours();
     const tod  = hr<12?'Morning':hr<17?'Afternoon':'Evening';
@@ -1861,12 +1884,14 @@ const MemoryGarden = {
     list.unshift(memory);
     this.save(list);
     this.render();
+    if (typeof Analytics !== 'undefined' && Analytics.updateStats) Analytics.updateStats();
   },
 
   delete(id) {
     const list = this.get().filter(m => m.id !== id);
     this.save(list);
     this.render();
+    if (typeof Analytics !== 'undefined' && Analytics.updateStats) Analytics.updateStats();
   },
 
   filter(category, btn) {
