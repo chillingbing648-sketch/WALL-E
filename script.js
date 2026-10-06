@@ -28,6 +28,9 @@ const KEYS = {
   CHAT:        'walle_chat',
   PERSONALITY: 'walle_personality',
   GRATITUDE:   'walle_gratitude',
+  MEMORIES:    'walle_memories',
+  MOMENTS:     'walle_moments',
+  STARS:       'walle_stars',
 };
 
 const MOOD_EMOJI = { Happy:'😊', Calm:'😌', Neutral:'😐', Stressed:'😰', Sad:'😢' };
@@ -597,6 +600,9 @@ const AppController = {
     AnalyticsSystem.renderAffirmation();
     BoostSystem.init();
     Analytics.updateScore();
+    MemoryGarden.render();
+    MentalWeatherSystem.render();
+    ConstellationSystem.render();
   },
 
   /* ── Navigation ────────────────────────────────────────────── */
@@ -625,6 +631,7 @@ const AppController = {
          journal:'Wellness Journal',
        habits:'Habit Tracker',
        moodboost:'Mood Boost',
+       garden:'Memory Garden',
        recommendations:'Insights',
         report:'Wellness Report',
         sounds:'Zen Station',
@@ -634,7 +641,12 @@ const AppController = {
     if (sectionId==='dashboard') {
       Analytics.updateStats();
       Analytics.updateScore();
+      MentalWeatherSystem.render();
+      ConstellationSystem.render();
       setTimeout(()=>{ if(_$('section-dashboard')?.classList.contains('active')) Analytics.buildCharts(); }, 80);
+    }
+    if (sectionId==='garden') {
+      MemoryGarden.render();
     }
     if (sectionId==='report') {
       setTimeout(()=>{ if(_$('section-report')?.classList.contains('active')) AnalyticsSystem.buildReport(); }, 100);
@@ -681,11 +693,12 @@ const MoodSystem = {
     _selectedMood = null;
     _setText('mood-selection-feedback','');
     msgEl.textContent='✓ Mood logged!'; msgEl.style.color='var(--c-emerald)';
-    setTimeout(()=>{ msgEl.textContent=''; }, 3000);
     this.render();
     Analytics.updateStats();
     Analytics.updateScore();
     AICompanion.updateAvatar();
+    ConstellationSystem.addStar('mood', `Logged mood: ${entry.mood}`);
+    MentalWeatherSystem.render();
   },
 
   delete(id) {
@@ -693,6 +706,7 @@ const MoodSystem = {
     this.render();
     Analytics.updateStats();
     Analytics.updateScore();
+    MentalWeatherSystem.render();
   },
 
   render() {
@@ -1163,7 +1177,11 @@ const JournalSystem = {
     this.renderList();
     Analytics.updateStats();
     Analytics.updateScore();
-    msgEl.textContent='✓ Entry saved!'; msgEl.style.color='var(--c-emerald)';
+    if(!_editJournalId){
+      ConstellationSystem.addStar('journal', `Reflected in journal: ${title}`);
+      MemoryGarden.plantFromSource('reflection', title, body);
+    }
+    msgEl.textContent='✓ Entry saved & planted in your Memory Garden! 🌱'; msgEl.style.color='var(--c-emerald)';
     setTimeout(()=>{ msgEl.textContent=''; }, 2500);
   },
 
@@ -1230,8 +1248,13 @@ const HabitSystem = {
 
   toggle(id) {
     const log=this.getLog(); const key=_todayKey(); const today=log[key]||[];
+    const isNowDone=!today.includes(id);
     log[key]=today.includes(id)?today.filter(i=>i!==id):[...today,id];
     this.saveLog(log); this.renderList(); this.renderStreaks(); Analytics.updateStats(); Analytics.updateScore();
+    if(isNowDone){
+      const h=this.get().find(h=>h.id===id);
+      ConstellationSystem.addStar('habit', `Cared for self: ${h ? h.name : 'Completed habit'}`);
+    }
   },
 
   delete(id) {
@@ -1359,9 +1382,11 @@ const BoostSystem = {
     const entry={ id:Date.now(), items:[g1,g2,g3], timestamp:new Date().toISOString() };
     const list=this._getGrat(); list.unshift(entry); this._saveGrat(list);
     ['grat-1','grat-2','grat-3'].forEach(id=>_$(id).value='');
-    msg.textContent='✓ Gratitude saved! 🧠 Your brain thanks you.'; msg.style.color='var(--c-emerald)';
-    setTimeout(()=>{ msg.textContent=''; }, 3000);
+    msg.textContent='✓ Gratitude saved & blossomed in your Memory Garden! ✨'; msg.style.color='var(--c-emerald)';
+    setTimeout(()=>{ if(msg) msg.textContent=''; }, 3000);
     this._renderGratHistory();
+    ConstellationSystem.addStar('gratitude', `Practiced gratitude: ${g1.slice(0,30)}…`);
+    MemoryGarden.plantFromSource('gratitude', 'Daily Gratitude', `1. ${g1}\n2. ${g2}\n3. ${g3}`);
   },
 
   _renderGratHistory() {
@@ -1737,6 +1762,614 @@ const SoundSystem = {
       }
     });
     this.activeSounds = {};
+  }
+};
+
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 1 — WALL·E MEMORY GARDEN
+   A living digital garden where wins, gratitude & reflections bloom.
+══════════════════════════════════════════════════════════════ */
+const MemoryGarden = {
+  _currentFilter: 'all',
+  _selectedType: 'win',
+
+  get() {
+    return Storage.readUser(KEYS.MEMORIES, _currentUser?.username || 'demo', []);
+  },
+
+  save(memories) {
+    return Storage.writeUser(KEYS.MEMORIES, _currentUser?.username || 'demo', memories);
+  },
+
+  openAddModal() {
+    const modal = _$('memory-modal');
+    if (!modal) return;
+    _$('memory-input-title').value = '';
+    _$('memory-input-note').value = '';
+    _$('memory-modal-msg').textContent = '';
+    this.selectType('win');
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  },
+
+  closeAddModal() {
+    const modal = _$('memory-modal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  },
+
+  selectType(type, btn) {
+    this._selectedType = type;
+    const buttons = _qsa('.mem-type-btn');
+    buttons.forEach(b => {
+      b.classList.toggle('active', b.dataset.type === type);
+    });
+  },
+
+  saveNewMemory() {
+    const titleInput = _$('memory-input-title');
+    const noteInput = _$('memory-input-note');
+    const msg = _$('memory-modal-msg');
+    const title = titleInput.value.trim();
+    const note = noteInput.value.trim();
+
+    if (!title) {
+      if (msg) msg.textContent = 'Please give your memory a small title or note.';
+      titleInput.focus();
+      return;
+    }
+
+    const typeIcons = { win: '🌸', gratitude: '✨', memory: '🌱', reflection: '🌙' };
+    const memory = {
+      id: Date.now(),
+      type: this._selectedType,
+      title,
+      note,
+      icon: typeIcons[this._selectedType] || '🌱',
+      x: 10 + Math.random() * 80, // % left position in viewport
+      y: 12 + Math.random() * 45, // % bottom offset from ground
+      createdAt: new Date().toISOString()
+    };
+
+    const list = this.get();
+    list.unshift(memory);
+    this.save(list);
+    this.closeAddModal();
+    this.render();
+
+    // Cross-pollinate with Tiny Wins Constellation
+    ConstellationSystem.addStar('garden', `Planted memory: ${title}`);
+  },
+
+  /* Programmatic entry from other systems (Journal, Gratitude, WALL-E Moment) */
+  plantFromSource(type, title, note) {
+    if (!title) return;
+    const typeIcons = { win: '🌸', gratitude: '✨', memory: '🌱', reflection: '🌙' };
+    const memory = {
+      id: Date.now(),
+      type: type || 'win',
+      title,
+      note: note || '',
+      icon: typeIcons[type] || '🌱',
+      x: 10 + Math.random() * 80,
+      y: 12 + Math.random() * 45,
+      createdAt: new Date().toISOString()
+    };
+    const list = this.get();
+    list.unshift(memory);
+    this.save(list);
+    this.render();
+  },
+
+  delete(id) {
+    const list = this.get().filter(m => m.id !== id);
+    this.save(list);
+    this.render();
+  },
+
+  filter(category, btn) {
+    this._currentFilter = category;
+    _qsa('.garden-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+    this.renderArchive();
+  },
+
+  render() {
+    this.renderFlora();
+    this.renderArchive();
+  },
+
+  renderFlora() {
+    const container = _$('garden-flora');
+    const emptyNotice = _$('garden-empty-notice');
+    const countEl = _$('garden-bloom-count');
+    const statusEl = _$('garden-sky-status');
+    if (!container) return;
+
+    const list = this.get();
+    if (countEl) countEl.textContent = `🌱 ${list.length} living bloom${list.length === 1 ? '' : 's'}`;
+    if (emptyNotice) emptyNotice.classList.toggle('hidden', list.length > 0);
+
+    if (statusEl) {
+      if (list.length >= 10) statusEl.textContent = 'A flourishing world illuminated by your reflections';
+      else if (list.length >= 4) statusEl.textContent = 'Gentle growth taking root under quiet stars';
+      else statusEl.textContent = 'Quiet sanctuary under starlight';
+    }
+
+    // Render flora nodes
+    container.innerHTML = list.slice(0, 24).map(mem => `
+      <div class="garden-plant" style="left: ${mem.x}%; bottom: ${mem.y}%;" title="${_esc(mem.title)}" onclick="MemoryGarden.inspect(${mem.id})">
+        <span class="garden-plant-icon">${mem.icon}</span>
+        <span class="garden-plant-label">${_esc(mem.title.slice(0, 26))}</span>
+      </div>
+    `).join('');
+
+    // Organic Fireflies
+    const fireflyContainer = _$('garden-fireflies');
+    if (fireflyContainer && !fireflyContainer.children.length) {
+      fireflyContainer.innerHTML = Array.from({ length: 9 }).map((_, i) => {
+        const left = 5 + Math.random() * 90;
+        const top = 10 + Math.random() * 80;
+        const dur = 3 + Math.random() * 4;
+        return `<span class="garden-firefly" style="left:${left}%; top:${top}%; animation: orbDrift ${dur}s ease-in-out infinite alternate;"></span>`;
+      }).join('');
+    }
+  },
+
+  renderArchive() {
+    const listEl = _$('garden-entries-list');
+    if (!listEl) return;
+    const all = this.get();
+    const filtered = this._currentFilter === 'all'
+      ? all
+      : all.filter(m => m.type === this._currentFilter);
+
+    if (!filtered.length) {
+      listEl.innerHTML = '<p class="empty-state">No memories in this view. Plant one above or reflect in your journal!</p>';
+      return;
+    }
+
+    const typeNames = { win: 'Small Win', gratitude: 'Gratitude', memory: 'Warm Memory', reflection: 'Reflection' };
+    const typeColors = {
+      win: 'var(--mood-happy)',
+      gratitude: 'var(--accent-amber)',
+      memory: 'var(--accent-green)',
+      reflection: 'var(--accent-violet)'
+    };
+
+    listEl.innerHTML = filtered.map(m => {
+      const dateStr = new Date(m.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return `
+        <article class="garden-entry-card">
+          <div class="garden-entry-top">
+            <span class="garden-entry-type" style="color: ${typeColors[m.type] || 'var(--text-secondary)'}">
+              ${m.icon} ${typeNames[m.type] || 'Memory'}
+            </span>
+            <span class="garden-entry-date">${dateStr}</span>
+          </div>
+          <h4 class="garden-entry-title">${_esc(m.title)}</h4>
+          ${m.note ? `<p class="garden-entry-note">${_esc(m.note)}</p>` : ''}
+          <button type="button" class="garden-entry-del" onclick="MemoryGarden.delete(${m.id})" title="Remove memory">Remove</button>
+        </article>
+      `;
+    }).join('');
+  },
+
+  inspect(id) {
+    const mem = this.get().find(m => m.id === id);
+    if (!mem) return;
+    const detail = _$('constellation-star-detail');
+    if (detail) {
+      _$('star-detail-icon').textContent = mem.icon;
+      _$('star-detail-text').textContent = `${mem.title}${mem.note ? ' — ' + mem.note : ''}`;
+    }
+  }
+};
+
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 2 — A MOMENT WITH WALL·E
+   A guided, slow micro-experience system (1–3 min).
+══════════════════════════════════════════════════════════════ */
+const WallEMomentSystem = {
+  _currentMoment: null,
+  _currentStep: 0,
+  _timer: null,
+
+  EXPERIENCES: {
+    breaths: {
+      title: 'Three Slow Breaths',
+      steps: [
+        {
+          title: 'First slow breath',
+          desc: 'Close your eyes or soften your gaze. Breathe in slowly through your nose with WALL·E… and gently let it go.',
+          duration: 6
+        },
+        {
+          title: 'Second deep breath',
+          desc: 'Feel your chest expand. Hold for a heartbeat. Release any tension in your forehead and hands.',
+          duration: 6
+        },
+        {
+          title: 'Third resting breath',
+          desc: 'One full, nourishing breath. Exhale completely, letting your whole body arrive here right now.',
+          duration: 6
+        }
+      ],
+      completion: 'Your breath is your anchor. WALL·E felt the quiet shift with you.'
+    },
+    grounding: {
+      title: 'Notice Your Surroundings',
+      steps: [
+        {
+          title: '3 Things You See',
+          desc: 'Look gently around your room. Notice three simple objects or shadows without judging them.',
+          duration: 8
+        },
+        {
+          title: '2 Things You Feel',
+          desc: 'Notice the contact between your feet and the floor, or your hands resting in your lap.',
+          duration: 8
+        },
+        {
+          title: '1 Thing You Hear',
+          desc: 'Listen for the quietest sound around you. Let it simply be part of this peaceful moment.',
+          duration: 8
+        }
+      ],
+      completion: 'You are right here, safe in this present moment.'
+    },
+    shoulders: {
+      title: 'Drop Your Shoulders',
+      steps: [
+        {
+          title: 'Notice the tension',
+          desc: 'Without moving yet, notice where your shoulders are sitting. Are they creeping up toward your ears?',
+          duration: 6
+        },
+        {
+          title: 'Inhale & shrug upward',
+          desc: 'Bring your shoulders gently up toward your ears on an inhale…',
+          duration: 5
+        },
+        {
+          title: 'Exhale & drop',
+          desc: 'Drop them down completely with an open-mouthed exhale. Feel the sudden space around your neck.',
+          duration: 7
+        }
+      ],
+      completion: 'You do not have to carry the whole day on your shoulders.'
+    },
+    smallwin: {
+      title: 'Reflect on One Small Win',
+      steps: [
+        {
+          title: 'Think of one small effort',
+          desc: 'What is one tiny thing you did today? Woke up, drank water, showed kindness, or survived a hard hour?',
+          duration: 8
+        },
+        {
+          title: 'Acknowledge it quietly',
+          desc: 'Small victories count just as much. Give yourself credit for showing up today.',
+          duration: 8
+        }
+      ],
+      completion: 'Every gentle step forward matters. WALL·E is proud of you.'
+    },
+    sleep: {
+      title: 'Wind Down for Sleep',
+      steps: [
+        {
+          title: 'Set down the day',
+          desc: 'Everything you did today was enough. Everything left undone can wait for tomorrow.',
+          duration: 8
+        },
+        {
+          title: 'Unclench and relax',
+          desc: 'Unclench your jaw, soften your tongue, and let your eyes become heavy.',
+          duration: 8
+        },
+        {
+          title: 'Resting beside you',
+          desc: 'WALL·E will keep the quiet watch. You are allowed to rest completely tonight.',
+          duration: 8
+        }
+      ],
+      completion: 'Wishing you deep, restorative sleep under starry quiet.'
+    }
+  },
+
+  openPicker() {
+    const modal = _$('moment-modal');
+    if (!modal) return;
+    this._showView('picker');
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  },
+
+  close() {
+    const modal = _$('moment-modal');
+    if (!modal) return;
+    if (this._timer) clearTimeout(this._timer);
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    this._currentMoment = null;
+  },
+
+  _showView(viewName) {
+    _qsa('.moment-view').forEach(v => v.classList.remove('active'));
+    const target = _$(`moment-${viewName}-view`);
+    if (target) target.classList.add('active');
+  },
+
+  start(expKey) {
+    const exp = this.EXPERIENCES[expKey];
+    if (!exp) return;
+    this._currentMoment = exp;
+    this._currentStep = 0;
+    this._showView('active');
+    this._renderStep();
+  },
+
+  _renderStep() {
+    const exp = this._currentMoment;
+    if (!exp) return;
+    const step = exp.steps[this._currentStep];
+    const total = exp.steps.length;
+
+    _setText('moment-step-pill', `Step ${this._currentStep + 1} of ${total}`);
+    _setText('moment-prompt-title', step.title);
+    _setText('moment-prompt-desc', step.desc);
+
+    const nextBtn = _$('moment-next-btn');
+    if (nextBtn) {
+      nextBtn.textContent = this._currentStep === total - 1 ? 'Finish Moment ✓' : 'Continue →';
+    }
+
+    // Micro-motion for companion avatar
+    const face = _$('moment-avatar-char');
+    const glow = _$('moment-avatar-glow');
+    if (window.gsap && !MotionSystem.reduced()) {
+      if (face) window.gsap.fromTo(face, { scale: 0.94 }, { scale: 1, duration: 0.45, ease: 'back.out(1.6)' });
+      if (glow) window.gsap.fromTo(glow, { scale: 1.3, opacity: 0.9 }, { scale: 1, opacity: 0.4, duration: 0.6 });
+    }
+  },
+
+  nextStep() {
+    const exp = this._currentMoment;
+    if (!exp) return;
+    if (this._currentStep < exp.steps.length - 1) {
+      this._currentStep++;
+      this._renderStep();
+    } else {
+      this._finish();
+    }
+  },
+
+  _finish() {
+    const exp = this._currentMoment;
+    if (!exp) return;
+    this._showView('done');
+    _setText('moment-done-title', `${exp.title} Complete`);
+    _setText('moment-done-desc', exp.completion);
+
+    // Save moment completion locally
+    const completions = Storage.readUser(KEYS.MOMENTS, _currentUser?.username || 'demo', []);
+    completions.unshift({
+      id: Date.now(),
+      title: exp.title,
+      timestamp: new Date().toISOString()
+    });
+    Storage.writeUser(KEYS.MOMENTS, _currentUser?.username || 'demo', completions.slice(0, 50));
+
+    // Create star in Tiny Wins Constellation
+    ConstellationSystem.addStar('moment', `Shared moment with WALL·E: ${exp.title}`);
+  },
+
+  plantToGarden() {
+    if (!this._currentMoment) return;
+    MemoryGarden.plantFromSource('win', `A Moment with WALL·E: ${this._currentMoment.title}`, this._currentMoment.completion);
+    this.close();
+  }
+};
+
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 3 — MENTAL WEATHER
+   A visual, non-diagnostic representation of recent self-reported states.
+══════════════════════════════════════════════════════════════ */
+const MentalWeatherSystem = {
+  calculate() {
+    const moods = MoodSystem.get();
+    if (!moods || !moods.length) {
+      return {
+        type: 'clear',
+        title: 'Calm Clear Sky',
+        badge: '✦ Emotional Climate',
+        icon: '☀️',
+        summary: 'Your sky is calm and open. Log a check-in to reflect your state.',
+        mood: 'Calm',
+        energy: 'Steady',
+        tension: 'Low',
+        glow: 'radial-gradient(circle, rgba(56, 189, 248, 0.22), transparent 70%)'
+      };
+    }
+
+    // Look at last 5 mood entries
+    const recent = moods.slice(0, 5);
+    const avgScore = recent.reduce((sum, m) => sum + (m.score || 3), 0) / recent.length;
+    const latest = recent[0]?.mood;
+
+    if (avgScore >= 4.4) {
+      return {
+        type: 'clear',
+        title: 'Clear Golden Sunlight',
+        badge: '✦ Upbeat & Grounded',
+        icon: '☀️',
+        summary: 'Your recent check-ins feel buoyant and peaceful. Savor this light.',
+        mood: 'Happy',
+        energy: 'Vibrant',
+        tension: 'Low',
+        glow: 'radial-gradient(circle, rgba(245, 158, 11, 0.26), transparent 70%)'
+      };
+    } else if (avgScore >= 3.6) {
+      return {
+        type: 'sunset',
+        title: 'Calm Evening Horizon',
+        badge: '✦ Reflective & Centered',
+        icon: '🌅',
+        summary: 'Your recent check-ins feel reflective and serene, like twilight settling in.',
+        mood: 'Calm',
+        energy: 'Balanced',
+        tension: 'Moderate',
+        glow: 'radial-gradient(circle, rgba(167, 139, 250, 0.22), transparent 70%)'
+      };
+    } else if (avgScore >= 2.8) {
+      return {
+        type: 'clouds',
+        title: 'Soft Drifting Clouds',
+        badge: '✦ Steady & Neutral',
+        icon: '⛅',
+        summary: 'A neutral, steady climate. A good time to take small breaths and check in gently.',
+        mood: 'Neutral',
+        energy: 'Mild',
+        tension: 'Moderate',
+        glow: 'radial-gradient(circle, rgba(148, 163, 184, 0.2), transparent 70%)'
+      };
+    } else if (latest === 'Stressed' || avgScore >= 2.0) {
+      return {
+        type: 'wind',
+        title: 'Restless Starlight Wind',
+        badge: '✦ Carrying Extra Tension',
+        icon: '🌬️',
+        summary: 'You may be carrying a bit more tension than usual. Give yourself permission to pause.',
+        mood: 'Stressed',
+        energy: 'Restless',
+        tension: 'Elevated',
+        glow: 'radial-gradient(circle, rgba(129, 140, 248, 0.25), transparent 70%)'
+      };
+    } else {
+      return {
+        type: 'rain',
+        title: 'Gentle Cleansing Rain',
+        badge: '✦ Low Energy & Tender',
+        icon: '🌧️',
+        summary: 'Your check-ins show lower emotional energy. Heavy days pass; be extraordinarily gentle with yourself.',
+        mood: 'Sad',
+        energy: 'Low',
+        tension: 'Gentle Care Needed',
+        glow: 'radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 70%)'
+      };
+    }
+  },
+
+  render() {
+    const data = this.calculate();
+    _setText('weather-badge', data.badge);
+    _setText('weather-title', data.title);
+    _setText('weather-summary', data.summary);
+    _setText('weather-art-icon', data.icon);
+
+    const glowEl = _$('weather-glow');
+    if (glowEl) glowEl.style.background = data.glow;
+
+    const moodFactor = _$('wf-mood');
+    const energyFactor = _$('wf-energy');
+    const stressFactor = _$('wf-stress');
+
+    if (moodFactor) moodFactor.innerHTML = `Mood: <strong>${data.mood}</strong>`;
+    if (energyFactor) energyFactor.innerHTML = `Energy: <strong>${data.energy}</strong>`;
+    if (stressFactor) stressFactor.innerHTML = `Tension: <strong>${data.tension}</strong>`;
+  }
+};
+
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 4 — TINY WINS CONSTELLATION
+   A soft alternative to streaks: positive actions light stars in your sky.
+══════════════════════════════════════════════════════════════ */
+const ConstellationSystem = {
+  get() {
+    return Storage.readUser(KEYS.STARS, _currentUser?.username || 'demo', []);
+  },
+
+  save(stars) {
+    return Storage.writeUser(KEYS.STARS, _currentUser?.username || 'demo', stars.slice(0, 60));
+  },
+
+  addStar(source, title) {
+    const list = this.get();
+    // Maximum 25 visual stars in the canvas constellation
+    const star = {
+      id: Date.now(),
+      source: source || 'care',
+      title: title || 'Cared for yourself',
+      // Normalized SVG coordinates in 460x200 box
+      cx: 30 + Math.random() * 400,
+      cy: 25 + Math.random() * 150,
+      r: 3 + Math.random() * 2.5,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    };
+    list.unshift(star);
+    this.save(list);
+    this.render();
+  },
+
+  render() {
+    const stars = this.get();
+    const countPill = _$('constellation-count-pill');
+    if (countPill) {
+      countPill.textContent = `${stars.length} Star${stars.length === 1 ? '' : 's'} Formed`;
+    }
+
+    const svgStars = _$('constellation-stars');
+    const svgLines = _$('constellation-lines');
+    if (!svgStars || !svgLines) return;
+
+    if (!stars.length) {
+      // Seed default quiet constellation if user is brand new
+      svgStars.innerHTML = `
+        <circle cx="120" cy="80" r="3.5" fill="#f59e0b" filter="url(#starGlow)" opacity="0.6"/>
+        <circle cx="230" cy="60" r="4.5" fill="#fbbf24" filter="url(#starGlow)" opacity="0.8"/>
+        <circle cx="340" cy="110" r="3.5" fill="#60a5fa" filter="url(#starGlow)" opacity="0.6"/>
+      `;
+      svgLines.innerHTML = `
+        <line x1="120" y1="80" x2="230" y2="60" stroke="url(#starLineGrad)" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+        <line x1="230" y1="60" x2="340" y2="110" stroke="url(#starLineGrad)" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+      `;
+      return;
+    }
+
+    // Render up to 20 connected constellation stars
+    const displayStars = stars.slice(0, 20);
+
+    // Connect stars chronologically with soft atmospheric lines
+    let linesMarkup = '';
+    for (let i = 0; i < displayStars.length - 1; i++) {
+      const s1 = displayStars[i];
+      const s2 = displayStars[i + 1];
+      linesMarkup += `<line x1="${s1.cx}" y1="${s1.cy}" x2="${s2.cx}" y2="${s2.cy}" stroke="url(#starLineGrad)" stroke-width="1.2" opacity="0.45"/>`;
+    }
+    svgLines.innerHTML = linesMarkup;
+
+    // Render stars
+    svgStars.innerHTML = displayStars.map(s => `
+      <circle class="constellation-star" cx="${s.cx}" cy="${s.cy}" r="${s.r}" fill="#fbbf24" filter="url(#starGlow)" onclick="ConstellationSystem.inspectStar(${s.id})"/>
+    `).join('');
+  },
+
+  inspectStar(id) {
+    const star = this.get().find(s => s.id === id);
+    if (!star) return;
+    const detail = _$('constellation-star-detail');
+    if (detail) {
+      _$('star-detail-icon').textContent = '🌟';
+      _$('star-detail-text').textContent = `${star.title} · ${star.date}`;
+      if (window.gsap && !MotionSystem.reduced()) {
+        window.gsap.fromTo(detail, { scale: 0.98 }, { scale: 1, duration: 0.25, ease: 'power2.out' });
+      }
+    }
   }
 };
 

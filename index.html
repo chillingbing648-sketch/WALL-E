@@ -138,6 +138,10 @@
           <span class="nav-link-text">Mood Boost</span>
           <span class="nav-badge">NEW</span>
         </a>
+        <a href="#section-garden" class="nav-link" data-section="garden" onclick="event.preventDefault(); AppController.navigate('garden')">
+          <span class="nav-link-icon">🌱</span>
+          <span class="nav-link-text">Memory Garden</span>
+        </a>
         <a href="#section-recommendations" class="nav-link" data-section="recommendations" onclick="event.preventDefault(); AppController.navigate('recommendations')">
           <span class="nav-link-icon">◒</span>
           <span class="nav-link-text">Insights</span>
@@ -298,6 +302,65 @@
           <h3 class="chart-card-title">Weekly Habit Completion</h3>
           <div class="chart-body-wide"><canvas id="habitChart"></canvas></div>
         </div>
+
+        <!-- Dashboard Cohesive Wellness Showcase: Mental Weather & Tiny Wins Constellation -->
+        <div class="dashboard-wellness-showcase motion-reveal mt-4">
+          <!-- Mental Weather Card -->
+          <div class="card weather-card glass-panel" id="dashboard-weather-card">
+            <div class="weather-card-head">
+              <div>
+                <span class="weather-badge" id="weather-badge">✦ Emotional Climate</span>
+                <h3 class="weather-title" id="weather-title">Calm Clear Sky</h3>
+              </div>
+              <div class="weather-art-wrap" id="weather-art-icon" aria-hidden="true">☀️</div>
+            </div>
+            <div class="weather-sky-stage" id="weather-sky-stage">
+              <div class="weather-ambient-glow" id="weather-glow"></div>
+              <div class="weather-particles" id="weather-particles"></div>
+            </div>
+            <p class="weather-summary" id="weather-summary">Your recent check-ins feel grounded and balanced.</p>
+            <div class="weather-factors" id="weather-factors">
+              <span class="weather-factor-pill" id="wf-mood">Mood: <strong>Calm</strong></span>
+              <span class="weather-factor-pill" id="wf-energy">Energy: <strong>Steady</strong></span>
+              <span class="weather-factor-pill" id="wf-stress">Tension: <strong>Low</strong></span>
+            </div>
+          </div>
+
+          <!-- Tiny Wins Constellation Card -->
+          <div class="card constellation-card glass-panel" id="dashboard-constellation-card">
+            <div class="constellation-head">
+              <div>
+                <span class="constellation-badge">✦ Care Over Streaks</span>
+                <h3 class="constellation-title">Tiny Wins Constellation</h3>
+              </div>
+              <span class="constellation-count-pill" id="constellation-count-pill">0 Stars Formed</span>
+            </div>
+            <div class="constellation-canvas-wrap">
+              <svg id="constellation-svg" class="constellation-svg" viewBox="0 0 460 200" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="starLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(245, 158, 11, 0.45)"/>
+                    <stop offset="100%" stop-color="rgba(99, 102, 241, 0.45)"/>
+                  </linearGradient>
+                  <filter id="starGlow">
+                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <g id="constellation-lines"></g>
+                <g id="constellation-stars"></g>
+              </svg>
+            </div>
+            <p class="constellation-msg" id="constellation-msg">You cared for yourself today. Each small positive step lights a star in your sky.</p>
+            <div class="constellation-star-detail" id="constellation-star-detail">
+              <span class="star-detail-icon" id="star-detail-icon">✨</span>
+              <span class="star-detail-text" id="star-detail-text">Tap any star to see what moment created it.</span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ══════════════════════════════════
@@ -404,7 +467,10 @@
               <p class="chat-bot-mood" id="avatar-mood-txt">Ready to listen</p>
               <span class="personality-chip" id="pchip">😊 Friend Mode</span>
             </div>
-            <button class="btn-ghost btn-sm clear-chat-btn" onclick="AICompanion.clearChat()">Clear</button>
+            <div class="chat-header-actions">
+              <button class="btn-primary btn-sm moment-launch-btn" onclick="WallEMomentSystem.openPicker()">✦ A Moment with WALL·E</button>
+              <button class="btn-ghost btn-sm clear-chat-btn" onclick="AICompanion.clearChat()">Clear</button>
+            </div>
           </div>
 
           <div class="chat-messages" id="chat-messages"></div>
@@ -658,6 +724,53 @@
       </section>
 
       <!-- ══════════════════════════════════
+           MEMORY GARDEN
+      ══════════════════════════════════ -->
+      <section id="section-garden" class="page-section">
+        <div class="page-header">
+          <h2 class="page-title">WALL·E Memory Garden</h2>
+          <p class="page-subtitle">Your emotional memories slowly becoming a little world. Each small win, reflection, and gratitude blooms here.</p>
+        </div>
+
+        <!-- Garden Visual Canvas -->
+        <div class="card garden-canvas-card glass-panel motion-reveal">
+          <div class="garden-canvas-header">
+            <div class="garden-meta-stats">
+              <span class="garden-bloom-badge" id="garden-bloom-count">🌱 0 living blooms</span>
+              <span class="garden-sky-status" id="garden-sky-status">Quiet sanctuary under starlight</span>
+            </div>
+            <button class="btn-primary btn-sm" onclick="MemoryGarden.openAddModal()">✦ Plant a Memory</button>
+          </div>
+
+          <div class="garden-world-viewport" id="garden-world">
+            <div class="garden-sky-glow"></div>
+            <div class="garden-ground-layer"></div>
+            <div class="garden-flora-container" id="garden-flora"></div>
+            <div class="garden-fireflies" id="garden-fireflies"></div>
+            <div class="garden-empty-notice" id="garden-empty-notice">
+              <span class="garden-empty-icon">🌱</span>
+              <p>Your garden is quiet right now.<br><small>Plant your first win, gratitude, or quiet memory to watch it grow.</small></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Garden Memories Archive -->
+        <div class="card mt-4 glass-panel motion-reveal">
+          <div class="garden-archive-header">
+            <h3 class="card-title">Memory Archive</h3>
+            <div class="garden-filter-row">
+              <button class="garden-filter-btn active" data-filter="all" onclick="MemoryGarden.filter('all', this)">All</button>
+              <button class="garden-filter-btn" data-filter="win" onclick="MemoryGarden.filter('win', this)">Wins</button>
+              <button class="garden-filter-btn" data-filter="gratitude" onclick="MemoryGarden.filter('gratitude', this)">Gratitude</button>
+              <button class="garden-filter-btn" data-filter="memory" onclick="MemoryGarden.filter('memory', this)">Memories</button>
+              <button class="garden-filter-btn" data-filter="reflection" onclick="MemoryGarden.filter('reflection', this)">Reflections</button>
+            </div>
+          </div>
+          <div class="garden-entries-list" id="garden-entries-list"></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════
            INSIGHTS / RECOMMENDATIONS
       ══════════════════════════════════ -->
       <section id="section-recommendations" class="page-section">
@@ -740,9 +853,12 @@
            ZEN STATION (SOUNDS)
       ══════════════════════════════════ -->
       <section id="section-sounds" class="page-section">
-        <div class="page-header">
-          <h2 class="page-title">Zen Station</h2>
-          <p class="page-subtitle">Immersive soundscapes to calm your mind and improve focus.</p>
+        <div class="page-header page-header-split">
+          <div>
+            <h2 class="page-title">Zen Station</h2>
+            <p class="page-subtitle">Immersive soundscapes to calm your mind and improve focus.</p>
+          </div>
+          <button class="btn-primary btn-sm" onclick="WallEMomentSystem.openPicker()">✦ Guided Moment with WALL·E</button>
         </div>
 
         <div class="sounds-grid motion-reveal">
@@ -823,6 +939,147 @@
       </section>
 
     </main>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL: A MOMENT WITH WALL·E
+  ══════════════════════════════════════════ -->
+  <div id="moment-modal" class="walle-modal-backdrop" aria-hidden="true">
+    <div class="walle-modal-dialog glass-panel" role="dialog" aria-labelledby="moment-modal-title">
+      <button class="walle-modal-close" onclick="WallEMomentSystem.close()" aria-label="Close">✕</button>
+      
+      <!-- Selection Screen -->
+      <div id="moment-picker-view" class="moment-view active">
+        <div class="moment-header">
+          <div class="moment-robot-badge">🤖</div>
+          <h3 id="moment-modal-title" class="moment-title">A Moment with WALL·E</h3>
+          <p class="moment-subtitle">Take 1–3 quiet minutes away from the noise. Choose a simple calming practice together.</p>
+        </div>
+        <div class="moment-cards-grid">
+          <button class="moment-card" onclick="WallEMomentSystem.start('breaths')">
+            <span class="moment-card-icon">🌬️</span>
+            <div class="moment-card-body">
+              <strong>Three Slow Breaths</strong>
+              <small>Calm your pulse &amp; nervous system</small>
+            </div>
+            <span class="moment-card-tag">~1 min</span>
+          </button>
+          <button class="moment-card" onclick="WallEMomentSystem.start('grounding')">
+            <span class="moment-card-icon">🌿</span>
+            <div class="moment-card-body">
+              <strong>Notice Your Surroundings</strong>
+              <small>Sensory 3-2-1 grounding with WALL·E</small>
+            </div>
+            <span class="moment-card-tag">~2 min</span>
+          </button>
+          <button class="moment-card" onclick="WallEMomentSystem.start('shoulders')">
+            <span class="moment-card-icon">🕊️</span>
+            <div class="moment-card-body">
+              <strong>Drop Your Shoulders</strong>
+              <small>Unclench jaw, release neck tension</small>
+            </div>
+            <span class="moment-card-tag">~1.5 min</span>
+          </button>
+          <button class="moment-card" onclick="WallEMomentSystem.start('smallwin')">
+            <span class="moment-card-icon">🌱</span>
+            <div class="moment-card-body">
+              <strong>Reflect on One Win</strong>
+              <small>Honor a quiet moment of effort today</small>
+            </div>
+            <span class="moment-card-tag">~2 min</span>
+          </button>
+          <button class="moment-card" onclick="WallEMomentSystem.start('sleep')">
+            <span class="moment-card-icon">🌙</span>
+            <div class="moment-card-body">
+              <strong>Wind Down for Sleep</strong>
+              <small>Put down the weight of the day</small>
+            </div>
+            <span class="moment-card-tag">~2.5 min</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Experience Screen -->
+      <div id="moment-active-view" class="moment-view">
+        <div class="moment-active-stage">
+          <div class="moment-avatar-rig">
+            <div class="moment-avatar-glow" id="moment-avatar-glow"></div>
+            <div class="moment-avatar-char" id="moment-avatar-char">🤖</div>
+          </div>
+          <div class="moment-step-pill" id="moment-step-pill">Step 1 of 3</div>
+          <h4 class="moment-prompt-title" id="moment-prompt-title">Get comfortable</h4>
+          <p class="moment-prompt-desc" id="moment-prompt-desc">WALL·E is here beside you. Rest your gaze and let your breathing settle.</p>
+          <div class="moment-interactive-area" id="moment-interactive-area"></div>
+        </div>
+        <div class="moment-controls">
+          <button class="btn-ghost btn-sm" onclick="WallEMomentSystem.close()">Pause &amp; Exit</button>
+          <button class="btn-primary btn-sm" id="moment-next-btn" onclick="WallEMomentSystem.nextStep()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Completion Screen -->
+      <div id="moment-done-view" class="moment-view">
+        <div class="moment-done-stage">
+          <div class="moment-done-sparkle">✨</div>
+          <h4 class="moment-done-title" id="moment-done-title">Peaceful moment complete</h4>
+          <p class="moment-done-desc" id="moment-done-desc">You gave yourself time to breathe and reset. WALL·E saved this moment to your Tiny Wins constellation.</p>
+          <div class="moment-done-actions">
+            <button class="btn-ghost btn-sm" onclick="WallEMomentSystem.plantToGarden()">🌱 Add to Memory Garden</button>
+            <button class="btn-primary btn-sm" onclick="WallEMomentSystem.close()">Complete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL: PLANT A MEMORY
+  ══════════════════════════════════════════ -->
+  <div id="memory-modal" class="walle-modal-backdrop" aria-hidden="true">
+    <div class="walle-modal-dialog glass-panel" role="dialog" aria-labelledby="memory-modal-title">
+      <button class="walle-modal-close" onclick="MemoryGarden.closeAddModal()" aria-label="Close">✕</button>
+      <div class="moment-header">
+        <div class="moment-robot-badge">🌱</div>
+        <h3 id="memory-modal-title" class="moment-title">Plant a Living Memory</h3>
+        <p class="moment-subtitle">Every small win, gratitude, and comforting thought blossoms as a living part of your world.</p>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Memory Category</label>
+        <div class="memory-type-selector" id="memory-type-selector">
+          <button type="button" class="mem-type-btn active" data-type="win" onclick="MemoryGarden.selectType('win', this)">
+            <span>🌸</span> Small Win
+          </button>
+          <button type="button" class="mem-type-btn" data-type="gratitude" onclick="MemoryGarden.selectType('gratitude', this)">
+            <span>✨</span> Gratitude
+          </button>
+          <button type="button" class="mem-type-btn" data-type="memory" onclick="MemoryGarden.selectType('memory', this)">
+            <span>🌱</span> Warm Memory
+          </button>
+          <button type="button" class="mem-type-btn" data-type="reflection" onclick="MemoryGarden.selectType('reflection', this)">
+            <span>🌙</span> Reflection
+          </button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="memory-input-title">Memory Title / Win</label>
+        <input class="field-input" type="text" id="memory-input-title" placeholder="e.g. Took a slow 10-minute walk, Said no without guilt" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="memory-input-note">Reflection Note (optional)</label>
+        <textarea class="field-textarea" id="memory-input-note" rows="3" placeholder="What made this moment comforting or meaningful to you?"></textarea>
+      </div>
+
+      <div class="memory-modal-footer">
+        <p id="memory-modal-msg" class="form-error"></p>
+        <div class="memory-modal-btns">
+          <button class="btn-ghost btn-sm" onclick="MemoryGarden.closeAddModal()">Cancel</button>
+          <button class="btn-primary btn-sm" onclick="MemoryGarden.saveNewMemory()">Plant in Garden 🌱</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
