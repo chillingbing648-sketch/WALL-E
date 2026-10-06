@@ -6,8 +6,10 @@
   <title>WALL·E — Premium AI Mental Wellness</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -111,40 +113,40 @@
       </div>
 
       <nav class="sidebar-nav">
-        <a class="nav-link active" data-section="dashboard" onclick="AppController.navigate('dashboard')">
+        <a href="#section-dashboard" class="nav-link active" data-section="dashboard" onclick="event.preventDefault(); AppController.navigate('dashboard')">
           <span class="nav-link-icon">⬡</span>
           <span class="nav-link-text">Dashboard</span>
         </a>
-        <a class="nav-link" data-section="mood" onclick="AppController.navigate('mood')">
+        <a href="#section-mood" class="nav-link" data-section="mood" onclick="event.preventDefault(); AppController.navigate('mood')">
           <span class="nav-link-icon">◉</span>
           <span class="nav-link-text">Mood Tracker</span>
         </a>
-        <a class="nav-link" data-section="chat" onclick="AppController.navigate('chat')">
+        <a href="#section-chat" class="nav-link" data-section="chat" onclick="event.preventDefault(); AppController.navigate('chat')">
           <span class="nav-link-icon">◎</span>
           <span class="nav-link-text">AI Companion</span>
         </a>
-        <a class="nav-link" data-section="journal" onclick="AppController.navigate('journal')">
+        <a href="#section-journal" class="nav-link" data-section="journal" onclick="event.preventDefault(); AppController.navigate('journal')">
           <span class="nav-link-icon">◐</span>
           <span class="nav-link-text">Journal</span>
         </a>
-        <a class="nav-link" data-section="habits" onclick="AppController.navigate('habits')">
+        <a href="#section-habits" class="nav-link" data-section="habits" onclick="event.preventDefault(); AppController.navigate('habits')">
           <span class="nav-link-icon">◑</span>
           <span class="nav-link-text">Habits</span>
         </a>
-        <a class="nav-link nav-link-highlight" data-section="moodboost" onclick="AppController.navigate('moodboost')">
+        <a href="#section-moodboost" class="nav-link nav-link-highlight" data-section="moodboost" onclick="event.preventDefault(); AppController.navigate('moodboost')">
           <span class="nav-link-icon">✦</span>
           <span class="nav-link-text">Mood Boost</span>
           <span class="nav-badge">NEW</span>
         </a>
-        <a class="nav-link" data-section="recommendations" onclick="AppController.navigate('recommendations')">
+        <a href="#section-recommendations" class="nav-link" data-section="recommendations" onclick="event.preventDefault(); AppController.navigate('recommendations')">
           <span class="nav-link-icon">◒</span>
           <span class="nav-link-text">Insights</span>
         </a>
-        <a class="nav-link" data-section="report" onclick="AppController.navigate('report')">
+        <a href="#section-report" class="nav-link" data-section="report" onclick="event.preventDefault(); AppController.navigate('report')">
           <span class="nav-link-icon">◓</span>
           <span class="nav-link-text">Report</span>
         </a>
-        <a class="nav-link" data-section="Sounds" onclick="AppController.navigate('sounds')">
+        <a href="#section-sounds" class="nav-link" data-section="sounds" onclick="event.preventDefault(); AppController.navigate('sounds')">
           <span class="nav-link-icon">≋</span>
           <span class="nav-link-text">Zen Station</span>
         </a>
@@ -186,7 +188,7 @@
         </div>
 
         <!-- Wellness Score Hero -->
-        <div class="ws-hero card glass-panel">
+        <div class="ws-hero card glass-panel motion-reveal">
           <div class="ws-hero-ring-side">
             <p class="ws-ring-label">WELLNESS SCORE</p>
             <div class="ws-ring-container">
@@ -242,43 +244,43 @@
         </div>
 
         <!-- Stats Row -->
-        <div class="stats-row">
-          <div class="stat-tile glass-panel" onclick="AppController.navigate('mood')">
+        <div class="stats-row motion-reveal">
+          <a href="#section-mood" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('mood')">
             <div class="stat-tile-icon">🌤</div>
             <div class="stat-tile-body">
               <p class="stat-tile-label">Today's Mood</p>
               <p class="stat-tile-value" id="stat-today-mood">—</p>
             </div>
             <span class="stat-tile-arrow">›</span>
-          </div>
-          <div class="stat-tile glass-panel" onclick="AppController.navigate('habits')">
+          </a>
+          <a href="#section-habits" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('habits')">
             <div class="stat-tile-icon">🔥</div>
             <div class="stat-tile-body">
               <p class="stat-tile-label">Habit Streak</p>
               <p class="stat-tile-value" id="stat-streak">0 days</p>
             </div>
             <span class="stat-tile-arrow">›</span>
-          </div>
-          <div class="stat-tile glass-panel" onclick="AppController.navigate('journal')">
+          </a>
+          <a href="#section-journal" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('journal')">
             <div class="stat-tile-icon">📓</div>
             <div class="stat-tile-body">
               <p class="stat-tile-label">Journal Entries</p>
               <p class="stat-tile-value" id="stat-journal-count">0</p>
             </div>
             <span class="stat-tile-arrow">›</span>
-          </div>
-          <div class="stat-tile glass-panel" onclick="AppController.navigate('habits')">
+          </a>
+          <a href="#section-habits" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('habits')">
             <div class="stat-tile-icon">✅</div>
             <div class="stat-tile-body">
               <p class="stat-tile-label">Habits Today</p>
               <p class="stat-tile-value" id="stat-habits-today">0/0</p>
             </div>
             <span class="stat-tile-arrow">›</span>
-          </div>
+          </a>
         </div>
 
         <!-- Charts -->
-        <div class="charts-duo">
+        <div class="charts-duo motion-reveal">
           <div class="card chart-card glass-panel">
             <div class="chart-card-head">
               <h3 class="chart-card-title">Mood Trend (7 Days)</h3>
@@ -310,33 +312,34 @@
         <div class="card mood-log-card glass-panel">
           <h3 class="card-title">Log Today's Mood</h3>
           <p class="mood-prompt">Select the emotion that best describes you:</p>
-          <div class="mood-grid">
-            <button class="mood-tile" data-mood="Happy"    data-score="5" onclick="MoodSystem.select(this)">
+          <div class="mood-grid motion-reveal">
+            <button class="mood-tile" data-mood="Happy" aria-pressed="false" data-score="5" onclick="MoodSystem.select(this)">
               <span class="mood-tile-emoji">😊</span>
               <span class="mood-tile-label">Happy</span>
-              <div class="mood-tile-bar" style="background:var(--c-amber)"></div>
+              <div class="mood-tile-bar" style="background:var(--mood-happy)"></div>
             </button>
-            <button class="mood-tile" data-mood="Calm"     data-score="4" onclick="MoodSystem.select(this)">
+            <button class="mood-tile" data-mood="Calm" aria-pressed="false" data-score="4" onclick="MoodSystem.select(this)">
               <span class="mood-tile-emoji">😌</span>
               <span class="mood-tile-label">Calm</span>
-              <div class="mood-tile-bar" style="background:var(--c-sky)"></div>
+              <div class="mood-tile-bar" style="background:var(--mood-calm)"></div>
             </button>
-            <button class="mood-tile" data-mood="Neutral"  data-score="3" onclick="MoodSystem.select(this)">
+            <button class="mood-tile" data-mood="Neutral" aria-pressed="false" data-score="3" onclick="MoodSystem.select(this)">
               <span class="mood-tile-emoji">😐</span>
               <span class="mood-tile-label">Neutral</span>
-              <div class="mood-tile-bar" style="background:var(--c-slate)"></div>
+              <div class="mood-tile-bar" style="background:var(--mood-neutral)"></div>
             </button>
-            <button class="mood-tile" data-mood="Stressed" data-score="2" onclick="MoodSystem.select(this)">
+            <button class="mood-tile" data-mood="Stressed" aria-pressed="false" data-score="2" onclick="MoodSystem.select(this)">
               <span class="mood-tile-emoji">😰</span>
               <span class="mood-tile-label">Stressed</span>
-              <div class="mood-tile-bar" style="background:var(--c-violet)"></div>
+              <div class="mood-tile-bar" style="background:var(--mood-stressed)"></div>
             </button>
-            <button class="mood-tile" data-mood="Sad"      data-score="1" onclick="MoodSystem.select(this)">
+            <button class="mood-tile" data-mood="Sad" aria-pressed="false" data-score="1" onclick="MoodSystem.select(this)">
               <span class="mood-tile-emoji">😢</span>
               <span class="mood-tile-label">Sad</span>
-              <div class="mood-tile-bar" style="background:var(--c-rose)"></div>
+              <div class="mood-tile-bar" style="background:var(--mood-sad)"></div>
             </button>
           </div>
+          <p id="mood-selection-feedback" class="mood-selection-feedback" aria-live="polite"></p>
           <textarea id="mood-note" class="field-textarea" placeholder="Add a note about how you're feeling… (optional)"></textarea>
           <button class="btn-primary" onclick="MoodSystem.log()">Save Mood Entry</button>
           <p id="mood-saved-msg" class="feedback-msg"></p>
@@ -348,6 +351,7 @@
             <p class="empty-state">No mood entries yet. Log your first mood above!</p>
           </div>
         </div>
+
       </section>
 
       <!-- ══════════════════════════════════
@@ -386,7 +390,7 @@
           </div>
         </div>
 
-        <div class="card chat-card glass-panel">
+        <div class="card chat-card glass-panel motion-reveal">
           <div class="chat-avatar-panel">
             <div class="chat-avatar-rig">
               <div class="avatar-glow" id="avatar-glow"></div>
@@ -425,13 +429,13 @@
           <p class="page-subtitle">Reflect, express, and grow.</p>
         </div>
 
-        <div class="journal-layout">
+        <div class="journal-layout motion-reveal">
           <div class="card journal-write-panel glass-panel">
             <h3 class="card-title" id="journal-form-title">New Entry</h3>
             <input id="journal-title" class="field-input" type="text" placeholder="Entry title…" />
             <textarea id="journal-body" class="field-textarea journal-body-area" placeholder="Write your thoughts, feelings, or reflections here…"></textarea>
             <div class="journal-form-actions">
-              <button class="btn-primary" onclick="JournalSystem.save()">Save Entry</button>
+              <button class="btn-primary" onclick="JournalSystem.saveEntry()">Save Entry</button>
               <button class="btn-ghost" id="journal-cancel-btn" onclick="JournalSystem.clearForm()" style="display:none">Cancel Edit</button>
             </div>
             <p id="journal-saved-msg" class="feedback-msg"></p>
@@ -473,7 +477,7 @@
           </div>
         </div>
 
-        <div class="habits-layout">
+        <div class="habits-layout motion-reveal">
           <div class="card glass-panel">
             <h3 class="card-title">Today's Habits</h3>
             <div id="habits-list" class="habits-list">
@@ -498,7 +502,7 @@
           <p class="page-subtitle">Science-backed exercises to lift your spirits in minutes.</p>
         </div>
 
-        <div class="boost-grid">
+        <div class="boost-grid motion-reveal">
 
           <!-- Gratitude -->
           <div class="card boost-card glass-panel">
@@ -574,9 +578,9 @@
             </div>
             <p class="boost-card-desc">Inhale 4s → Hold 7s → Exhale 8s. Activates parasympathetic nervous system and reduces anxiety within 2 minutes.</p>
             <div class="breathing-wrap">
-              <div class="breathing-circle" id="breathing-circle">
+              <button type="button" class="breathing-circle" id="breathing-circle" aria-label="Start guided breathing">
                 <span id="breathing-label">Tap to Start</span>
-              </div>
+              </button>
             </div>
             <p class="breathing-hint" id="breathing-instruction">Click the circle to begin a guided breathing session.</p>
           </div>
@@ -604,6 +608,53 @@
           </div>
 
         </div>
+
+        <section class="tiny-resets" id="tiny-reset-games" aria-labelledby="tiny-resets-title">
+          <header class="tiny-resets-heading motion-reveal">
+            <div>
+              <h3 id="tiny-resets-title">Tiny resets</h3>
+              <p>Small, playful pauses. No scores, just a moment to settle.</p>
+            </div>
+          </header>
+          <div class="tiny-resets-grid">
+            <article class="mini-reset-card motion-reveal" data-game="calm-dots">
+              <div class="mini-reset-topline"><span aria-hidden="true">· · ·</span><span>01 / SETTLE</span></div>
+              <h4>Calm dots</h4>
+              <p>Let each little light rest when you feel ready.</p>
+              <div class="calm-dot-field" role="group" aria-label="Five lights to settle">
+                <button type="button" class="calm-dot" data-game-action="settle-dot" data-dot="1" aria-label="Settle light 1" aria-pressed="false"></button>
+                <button type="button" class="calm-dot" data-game-action="settle-dot" data-dot="2" aria-label="Settle light 2" aria-pressed="false"></button>
+                <button type="button" class="calm-dot" data-game-action="settle-dot" data-dot="3" aria-label="Settle light 3" aria-pressed="false"></button>
+                <button type="button" class="calm-dot" data-game-action="settle-dot" data-dot="4" aria-label="Settle light 4" aria-pressed="false"></button>
+                <button type="button" class="calm-dot" data-game-action="settle-dot" data-dot="5" aria-label="Settle light 5" aria-pressed="false"></button>
+              </div>
+              <p class="mini-reset-message" data-game-status aria-live="polite">Take your time.</p>
+              <button type="button" class="btn-ghost btn-sm" data-game-action="reset-dots">Reset lights</button>
+            </article>
+
+            <article class="mini-reset-card motion-reveal" data-game="gentle-pop">
+              <div class="mini-reset-topline"><span aria-hidden="true">◦</span><span>02 / PAUSE</span></div>
+              <h4>Gentle pop</h4>
+              <p>Follow the soft circle in and out with one easy tap.</p>
+              <div class="gentle-pop-stage" aria-hidden="true"><span class="gentle-pop-core"></span></div>
+              <p class="mini-reset-message" data-pop-message aria-live="polite">Ready when you are.</p>
+              <button type="button" class="btn-ghost btn-sm" data-game-action="gentle-pop">Take a gentle pause</button>
+              <button type="button" class="mini-reset-reset" data-game-action="reset-pop">Reset</button>
+            </article>
+
+            <article class="mini-reset-card motion-reveal" data-game="grow">
+              <div class="mini-reset-topline"><span aria-hidden="true">✳</span><span>03 / GROW</span></div>
+              <h4>A little growth</h4>
+              <p>Offer a small bit of care. There’s no rush to bloom.</p>
+              <div class="grow-stage" aria-hidden="true"><span class="grow-plant">🌰</span></div>
+              <p class="mini-reset-message" data-grow-message aria-live="polite">Every beginning is enough.</p>
+              <div class="mini-reset-actions">
+                <button type="button" class="btn-ghost btn-sm" data-game-action="grow">Give a little care</button>
+                <button type="button" class="mini-reset-reset" data-game-action="reset-grow">Start again</button>
+              </div>
+            </article>
+          </div>
+        </section>
       </section>
 
       <!-- ══════════════════════════════════
@@ -615,7 +666,7 @@
           <p class="page-subtitle">Personalized suggestions based on your mood patterns.</p>
         </div>
 
-        <div id="recommendations-container" class="rec-grid"></div>
+        <div id="recommendations-container" class="rec-grid motion-reveal"></div>
 
         <div class="insights-bottom-row">
           <div class="card affirmation-card glass-panel">
@@ -628,9 +679,9 @@
             <h3 class="card-title">4-7-8 Breathing</h3>
             <p class="card-desc">A calming technique to reduce stress in minutes.</p>
             <div class="breathing-wrap">
-              <div class="breathing-circle" id="breathing-circle-2">
+              <button type="button" class="breathing-circle" id="breathing-circle-2" aria-label="Start guided breathing">
                 <span id="breathing-label-2">Tap to Start</span>
-              </div>
+              </button>
             </div>
             <p class="breathing-hint" id="breathing-instruction-2">Click the circle to begin.</p>
           </div>
@@ -655,7 +706,7 @@
           <button class="btn-primary btn-sm" onclick="AnalyticsSystem.downloadReport()">⬇ Download</button>
         </div>
 
-        <div class="report-grid">
+        <div class="report-grid motion-reveal">
           <div class="card report-card glass-panel">
             <h3 class="card-title">📊 Summary</h3>
             <div id="report-summary" class="report-stat-list"></div>
@@ -694,7 +745,7 @@
           <p class="page-subtitle">Immersive soundscapes to calm your mind and improve focus.</p>
         </div>
 
-        <div class="sounds-grid">
+        <div class="sounds-grid motion-reveal">
           <div class="sound-category-label">Nature Melodies</div>
 
           <div class="sound-card glass-panel" onclick="SoundSystem.toggle('rain')">
@@ -703,8 +754,8 @@
               <h4>Summer Rain</h4>
               <p>Gentle pitter-patter</p>
             </div>
-            <button class="play-btn" id="btn-rain">▶</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('rain', this.value)">
+            <button type="button" class="play-btn" id="btn-rain" aria-label="Play Summer Rain" aria-pressed="false">▶</button>
+            <input type="range" class="volume-slider" aria-label="Summer Rain volume" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('rain', this.value)">
           </div>
 
           <div class="sound-card glass-panel" onclick="SoundSystem.toggle('ocean')">
@@ -713,8 +764,8 @@
               <h4>Ocean Waves</h4>
               <p>Rhythmic tides</p>
             </div>
-            <button class="play-btn" id="btn-ocean">▶</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('ocean', this.value)">
+            <button type="button" class="play-btn" id="btn-ocean" aria-label="Play Ocean Waves" aria-pressed="false">▶</button>
+            <input type="range" class="volume-slider" aria-label="Ocean Waves volume" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('ocean', this.value)">
           </div>
 
           <div class="sound-card glass-panel" onclick="SoundSystem.toggle('forest')">
@@ -723,8 +774,8 @@
               <h4>Mystic Forest</h4>
               <p>Birds &amp; rustling leaves</p>
             </div>
-            <button class="play-btn" id="btn-forest">▶</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('forest', this.value)">
+            <button type="button" class="play-btn" id="btn-forest" aria-label="Play Mystic Forest" aria-pressed="false">▶</button>
+            <input type="range" class="volume-slider" aria-label="Mystic Forest volume" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('forest', this.value)">
           </div>
 
           <div class="sound-card glass-panel" onclick="SoundSystem.toggle('fire')">
@@ -733,8 +784,8 @@
               <h4>Cozy Fireplace</h4>
               <p>Warm crackling wood</p>
             </div>
-            <button class="play-btn" id="btn-fire">▶</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('fire', this.value)">
+            <button type="button" class="play-btn" id="btn-fire" aria-label="Play Fireplace" aria-pressed="false">▶</button>
+            <input type="range" class="volume-slider" aria-label="Fireplace volume" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('fire', this.value)">
           </div>
 
           <div class="sound-category-label">Brainwave &amp; Focus</div>
@@ -745,8 +796,8 @@
               <h4>Alpha Waves</h4>
               <p>Binaural focus beats</p>
             </div>
-            <button class="play-btn" id="btn-binaural">▶</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('binaural', this.value)">
+            <button type="button" class="play-btn" id="btn-binaural" aria-label="Play Binaural" aria-pressed="false">▶</button>
+            <input type="range" class="volume-slider" aria-label="Binaural volume" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('binaural', this.value)">
           </div>
 
           <div class="sound-card glass-panel" onclick="SoundSystem.toggle('delta')">
@@ -755,8 +806,8 @@
               <h4>Deep Sleep</h4>
               <p>Delta frequency</p>
             </div>
-            <button class="play-btn" id="btn-delta">▶</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('delta', this.value)">
+            <button type="button" class="play-btn" id="btn-delta" aria-label="Play Delta Waves" aria-pressed="false">▶</button>
+            <input type="range" class="volume-slider" aria-label="Delta Waves volume" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('delta', this.value)">
           </div>
 
           <div class="sound-card glass-panel" onclick="SoundSystem.toggle('white')">
@@ -765,8 +816,8 @@
               <h4>White Noise</h4>
               <p>Pure static calm</p>
             </div>
-            <button class="play-btn" id="btn-white">▶</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('white', this.value)">
+            <button type="button" class="play-btn" id="btn-white" aria-label="Play White Noise" aria-pressed="false">▶</button>
+            <input type="range" class="volume-slider" aria-label="White Noise volume" min="0" max="1" step="0.1" value="0.5" onclick="event.stopPropagation()" oninput="SoundSystem.setVolume('white', this.value)">
           </div>
         </div>
       </section>

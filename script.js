@@ -31,10 +31,9 @@ const KEYS = {
 };
 
 const MOOD_EMOJI = { Happy:'😊', Calm:'😌', Neutral:'😐', Stressed:'😰', Sad:'😢' };
-const MOOD_SCORE = { Happy:5, Calm:4, Neutral:3, Stressed:2, Sad:1 };
-
 let _currentUser = null;
 let _selectedMood = null;
+const _chatReplyTimers = new Set();
 
 /* Chart instances */
 let _chartMoodTrend = null;
@@ -84,6 +83,430 @@ function _esc(str)  { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt
 function _dateKey(d){ return d.toISOString().slice(0,10); }
 function _todayKey(){ return _dateKey(new Date()); }
 function _rand(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function _safeId(id) { const value=Number(id); return Number.isSafeInteger(value)&&value>=0?value:0; }
+function _colorToken(name, fallback) {
+  if(typeof getComputedStyle!=='function') return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()||fallback;
+}
+function _withAlpha(hex, alpha) { return /^#[\da-f]{6}$/i.test(hex) ? `${hex}${alpha}` : hex; }
+
+/* Browser persistence boundary. Existing keys and JSON shapes stay unchanged. */
+const Storage = {
+  _corruptKeys: new Set(),
+  readJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch (error) {
+      if (error instanceof SyntaxError) this._corruptKeys.add(key);
+      console.warn(`WALL·E could not read stored data for "${key}".`, error);
+      return fallback;
+    }
+  },
+  writeJSON(key, value) {
+    if (this._corruptKeys.has(key)) return false;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (error) {
+      console.warn(`WALL·E could not save stored data for "${key}".`, error);
+      return false;
+    }
+  },
+  remove(key) {
+    try { localStorage.removeItem(key); return true; }
+    catch (error) { console.warn(`WALL·E could not remove stored data for "${key}".`, error); return false; }
+  },
+  readUser(key, username, fallback) {
+    const bucket = this.readJSON(key, {});
+    if (!bucket || typeof bucket !== 'object' || Array.isArray(bucket)) return fallback;
+    const value = Object.prototype.hasOwnProperty.call(bucket,username) ? bucket[username] : undefined;
+    if (Array.isArray(fallback)) return Array.isArray(value) ? value : fallback;
+    if (fallback && typeof fallback === 'object') return value && typeof value === 'object' && !Array.isArray(value) ? value : fallback;
+    return value ?? fallback;
+  },
+  writeUser(key, username, value) {
+    const bucket = this.readJSON(key, {});
+    if (!bucket || typeof bucket !== 'object' || Array.isArray(bucket)) return false;
+    Object.defineProperty(bucket,username,{value,writable:true,enumerable:true,configurable:true});
+    return this.writeJSON(key, bucket);
+  },
+};
+
+/* One motion owner for section choreography, selected state reactions and counters. */
+/* One cohesive motion architect for section choreography, tactile feedback, companion life and counters. */
+const MotionSystem = {
+  _contexts: new Map(),
+  _transient: new Set(),
+  _countTweens: new Map(),
+  _wallETween: null,
+  _initialized: false,
+
+  reduced() { return !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches; },
+
+  init() {
+    if (this._initialized) return;
+    this._initialized = true;
+    if (window.gsap && window.ScrollTrigger) {
+      window.gsap.registerPlugin(window.ScrollTrigger);
+    }
+    document.documentElement.classList.toggle('motion-gsap', !!window.gsap);
+
+    // Initial companion life
+    this.initCompanionLife();
+
+    // Tactile button micro-interaction listeners (delegated)
+    this.initButtonInteractions();
+
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', event => {
+      if (event.matches) {
+        this._contexts.forEach(context => context.revert());
+        this._contexts.clear();
+        this.stopTransient();
+        this.finishCounts();
+        this.stopCompanionLife();
+      } else {
+        this.initCompanionLife();
+        const active = _qs('.page-section.active');
+        if (active) this.show(active, active);
+      }
+    });
+  },
+
+  _track(tween) {
+    if (!tween) return tween;
+    this._transient.add(tween);
+    tween.eventCallback?.('onComplete', () => this._transient.delete(tween));
+    return tween;
+  },
+
+  stopTransient() {
+    this._transient.forEach(tween => tween.kill());
+    this._transient.clear();
+  },
+
+  finishCounts() {
+    this._countTweens.forEach((entry, element) => {
+      entry.tween.kill();
+      element.textContent = entry.format(entry.value);
+    });
+    this._countTweens.clear();
+  },
+
+  _leave(section) {
+    if (!section) return;
+    this._contexts.get(section)?.revert();
+    this._contexts.delete(section);
+    this.stopTransient();
+  },
+
+  cleanup() {
+    this._contexts.forEach(context => context.revert());
+    this._contexts.clear();
+    this.stopTransient();
+    this.finishCounts();
+    this.stopCompanionLife();
+  },
+
+  /* Smooth Section Entry Choreography */
+  show(previous, next) {
+    if (previous && previous !== next) this._leave(previous);
+    if (!next || (previous === next && this._contexts.has(next))) return;
+    if (!window.gsap || this.reduced()) return;
+
+    const gsap = window.gsap;
+    const context = gsap.context(() => {
+      // 1. Whole Section Entrance: soft atmospheric fade + gentle lift
+      gsap.fromTo(
+        next,
+        { autoAlpha: 0, y: 12 },
+        { autoAlpha: 1, y: 0, duration: 0.42, ease: 'power2.out', clearProps: 'transform' }
+      );
+
+      // 2. Page Header & Subtitle: sequential subtle reveal
+      const header = next.querySelector('.page-header');
+      if (header) {
+        const title = header.querySelector('.page-title');
+        const sub = header.querySelector('.page-subtitle');
+        const headerEls = [title, sub].filter(Boolean);
+        if (headerEls.length) {
+          gsap.from(headerEls, {
+            autoAlpha: 0,
+            y: 9,
+            duration: 0.45,
+            stagger: 0.08,
+            ease: 'power3.out',
+            delay: 0.06,
+            clearProps: 'transform'
+          });
+        }
+      }
+
+      // 3. Section Motion Reveals (Cards, Rows, Grids)
+      const reveals = Array.from(next.querySelectorAll('.motion-reveal'));
+      const vh = window.innerHeight;
+      const visible = reveals.filter(el => {
+        const rect = el.getBoundingClientRect();
+        return rect.top < vh * 0.92;
+      });
+      const belowFold = reveals.filter(el => !visible.includes(el));
+
+      if (visible.length) {
+        gsap.from(visible, {
+          autoAlpha: 0,
+          y: 16,
+          duration: 0.5,
+          stagger: 0.075,
+          ease: 'power2.out',
+          delay: 0.12,
+          clearProps: 'transform'
+        });
+      }
+
+      belowFold.forEach(el => {
+        if (window.ScrollTrigger) {
+          gsap.from(el, {
+            autoAlpha: 0,
+            y: 18,
+            duration: 0.52,
+            ease: 'power2.out',
+            clearProps: 'transform',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 88%',
+              once: true
+            }
+          });
+        } else {
+          gsap.from(el, {
+            autoAlpha: 0,
+            y: 18,
+            duration: 0.52,
+            ease: 'power2.out',
+            clearProps: 'transform'
+          });
+        }
+      });
+    }, next);
+
+    this._contexts.set(next, context);
+    window.ScrollTrigger?.refresh();
+  },
+
+  /* Smooth Progress Ring & Breakdown Bars Animation */
+  animateRing(ringElement, targetScore, previousScore = 0) {
+    if (!ringElement) return;
+    const targetOffset = 314 - 314 * (targetScore / 100);
+    if (!window.gsap || this.reduced()) {
+      ringElement.style.strokeDashoffset = targetOffset;
+      return;
+    }
+    const currentOffset = parseFloat(ringElement.style.strokeDashoffset) || (314 - 314 * (previousScore / 100));
+    const obj = { offset: currentOffset };
+    this._track(
+      window.gsap.to(obj, {
+        offset: targetOffset,
+        duration: 1.1,
+        ease: 'power2.out',
+        onUpdate: () => {
+          ringElement.style.strokeDashoffset = obj.offset;
+        }
+      })
+    );
+  },
+
+  /* WALL·E Character Idle & Emotional Life */
+  initCompanionLife() {
+    if (!window.gsap || this.reduced() || this._wallETween) return;
+    const face = _$('avatar-face');
+    const glow = _$('avatar-glow');
+    if (!face) return;
+
+    // Organic idle floating - soft, calm, non-cartoonish
+    const tl = window.gsap.timeline({ repeat: -1, yoyo: true });
+    tl.to(face, {
+      y: -3.5,
+      rotation: 0.8,
+      duration: 3.2,
+      ease: 'sine.inOut'
+    }).to(face, {
+      y: 0,
+      rotation: -0.5,
+      duration: 3.0,
+      ease: 'sine.inOut'
+    });
+
+    if (glow) {
+      window.gsap.to(glow, {
+        scale: 1.08,
+        opacity: 0.85,
+        duration: 2.8,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+    }
+
+    this._wallETween = tl;
+  },
+
+  stopCompanionLife() {
+    if (this._wallETween) {
+      this._wallETween.kill();
+      this._wallETween = null;
+    }
+    const face = _$('avatar-face');
+    const glow = _$('avatar-glow');
+    if (window.gsap) {
+      if (face) window.gsap.killTweensOf(face);
+      if (glow) window.gsap.killTweensOf(glow);
+    }
+  },
+
+  /* Mood Selection Tactile Feedback */
+  moodReact(button) {
+    if (!window.gsap || this.reduced()) return;
+    const face = _$('avatar-face');
+    const glow = _$('avatar-glow');
+    const moodTxt = _$('avatar-mood-txt');
+    const tl = window.gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+    // Tactile button bounce
+    if (button) {
+      tl.fromTo(button, { scale: 0.94 }, { scale: 1, duration: 0.24, ease: 'back.out(2)', clearProps: 'transform' });
+    }
+
+    // Companion acknowledges selection with subtle head tilt & warmth
+    if (face) {
+      tl.fromTo(
+        face,
+        { scale: 0.92, rotation: -2.5 },
+        { scale: 1, rotation: 0, duration: 0.38, ease: 'back.out(1.6)', clearProps: 'transform' },
+        '-=0.12'
+      );
+    }
+    if (glow) {
+      tl.fromTo(glow, { scale: 1.25, opacity: 1 }, { scale: 1, opacity: 0.7, duration: 0.45 }, '-=0.3');
+    }
+    if (moodTxt) {
+      tl.fromTo(moodTxt, { autoAlpha: 0.4, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.28, clearProps: 'transform' }, '-=0.25');
+    }
+    this._track(tl);
+  },
+
+  /* Generic Tactile Button Interactions */
+  initButtonInteractions() {
+    if (this.reduced() || !window.gsap) return;
+    // Fast, subtle button clicks across the app
+    document.addEventListener('pointerdown', event => {
+      const btn = event.target.closest('.btn-primary, .btn-ghost, .stat-tile, .pbar-btn, .mini-reset-btn');
+      if (!btn) return;
+      window.gsap.to(btn, { scale: 0.97, duration: 0.1, ease: 'power1.out' });
+    });
+    document.addEventListener('pointerup', event => {
+      const btn = event.target.closest('.btn-primary, .btn-ghost, .stat-tile, .pbar-btn, .mini-reset-btn');
+      if (!btn) return;
+      window.gsap.to(btn, { scale: 1, duration: 0.18, ease: 'power2.out', clearProps: 'transform' });
+    });
+  },
+
+  /* Quick Element Pulse */
+  pulse(element) {
+    if (!element || !window.gsap || this.reduced()) return;
+    window.gsap.killTweensOf(element);
+    this._track(
+      window.gsap.fromTo(element, { scale: 0.94 }, { scale: 1, duration: 0.38, ease: 'back.out(1.8)', clearProps: 'transform' })
+    );
+  },
+
+  /* Numeric Counter Tweening (Tabular) */
+  count(element, value, format = number => String(number)) {
+    const next = Number(value);
+    if (!element || !Number.isFinite(next)) return;
+    if (!window.gsap || this.reduced()) {
+      element.textContent = format(next);
+      return;
+    }
+    const active = this._countTweens.get(element);
+    const start = Number.parseInt(element.textContent, 10) || 0;
+    active?.tween.kill();
+    const counter = { value: start };
+    const entry = { tween: null, format, value: next };
+    entry.tween = window.gsap.to(counter, {
+      value: next,
+      duration: 0.65,
+      ease: 'power2.out',
+      onUpdate: () => {
+        element.textContent = format(Math.round(counter.value));
+      },
+      onComplete: () => {
+        if (this._countTweens.get(element) === entry) this._countTweens.delete(element);
+      }
+    });
+    this._countTweens.set(element, entry);
+  },
+};
+
+const TinyResetGames = {
+  root:null,
+  growStage:0,
+  popMessageIndex:0,
+  popMessages:['Take a breath.','That was a tiny reset.','Ready for another?'],
+  init() {
+    const root=_$('tiny-reset-games');
+    if(!root || this.root===root) return;
+    this.root=root;
+    root.addEventListener('click',event=>this.handle(event));
+  },
+  handle(event) {
+    const control=event.target.closest('[data-game-action]');
+    if(!control || !this.root.contains(control)) return;
+    const action=control.dataset.gameAction;
+    if(action==='settle-dot') this.settleDot(control);
+    if(action==='reset-dots') this.resetDots();
+    if(action==='gentle-pop') this.gentlePop();
+    if(action==='reset-pop') this.resetPop();
+    if(action==='grow') this.grow();
+    if(action==='reset-grow') this.resetGrow();
+  },
+  settleDot(dot) {
+    if(dot.getAttribute('aria-pressed')==='true') return;
+    dot.setAttribute('aria-pressed','true');
+    dot.classList.add('settled');
+    const remaining=this.root.querySelectorAll('.calm-dot[aria-pressed="false"]').length;
+    const status=this.root.querySelector('[data-game-status]');
+    if(status) status.textContent=remaining?'One quiet moment.': 'All settled. Nice pause.';
+    MotionSystem.pulse(dot);
+  },
+  resetDots() {
+    this.root.querySelectorAll('.calm-dot').forEach(dot=>{dot.setAttribute('aria-pressed','false');dot.classList.remove('settled');});
+    const status=this.root.querySelector('[data-game-status]'); if(status) status.textContent='Take your time.';
+  },
+  gentlePop() {
+    const message=this.root.querySelector('[data-pop-message]');
+    if(message){message.textContent=this.popMessages[this.popMessageIndex%this.popMessages.length];this.popMessageIndex++;}
+    MotionSystem.pulse(this.root.querySelector('.gentle-pop-core'));
+  },
+  resetPop() {
+    this.popMessageIndex=0;
+    const message=this.root.querySelector('[data-pop-message]'); if(message) message.textContent='Ready when you are.';
+    const core=this.root.querySelector('.gentle-pop-core'); if(core) core.style.removeProperty('transform');
+  },
+  grow() {
+    const plants=['🌰','🌱','🌿','🪴','🌼'];
+    this.growStage=Math.min(this.growStage+1,plants.length-1);
+    const plant=this.root.querySelector('.grow-plant'), message=this.root.querySelector('[data-grow-message]');
+    if(plant){plant.textContent=plants[this.growStage];plant.dataset.stage=String(this.growStage);MotionSystem.pulse(plant);}
+    if(message) message.textContent=this.growStage===plants.length-1?'Lovely, at your own pace.':'A little care is enough.';
+  },
+  resetGrow() {
+    this.growStage=0;
+    const plant=this.root.querySelector('.grow-plant'), message=this.root.querySelector('[data-grow-message]');
+    if(plant){plant.textContent='🌰';plant.dataset.stage='0';plant.style.removeProperty('transform');}
+    if(message) message.textContent='Every beginning is enough.';
+  },
+  resetAll() { this.resetDots(); this.resetPop(); this.resetGrow(); },
+};
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -92,8 +515,8 @@ function _rand(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 const AppController = {
 
   /* ── Auth helpers ─────────────────────────────────────────── */
-  getUsers()       { return JSON.parse(localStorage.getItem(KEYS.USERS) || '{}'); },
-  saveUsers(u)     { localStorage.setItem(KEYS.USERS, JSON.stringify(u)); },
+  getUsers()       { const users=Storage.readJSON(KEYS.USERS,{}); return users&&typeof users==='object'&&!Array.isArray(users)?users:{}; },
+  saveUsers(u)     { return Storage.writeJSON(KEYS.USERS,u); },
 
   toggleAuth() {
     _$('login-form').classList.toggle('active');
@@ -109,9 +532,9 @@ const AppController = {
     if (!user||!pass) { err.textContent='Please fill in all fields.'; return; }
     const users = this.getUsers();
     const rec   = users[user.toLowerCase()];
-    if (!rec || rec.password !== btoa(pass)) { err.textContent='Invalid username or password.'; return; }
+    if (!rec || typeof rec.name!=='string' || !rec.name.trim() || rec.password !== btoa(pass)) { err.textContent='Invalid username or password.'; return; }
     _currentUser = { username: user.toLowerCase(), name: rec.name };
-    localStorage.setItem(KEYS.CURRENT, JSON.stringify(_currentUser));
+    Storage.writeJSON(KEYS.CURRENT,_currentUser);
     this._launch();
   },
 
@@ -124,20 +547,25 @@ const AppController = {
     if (user.length<3) { err.textContent='Username must be at least 3 characters.'; return; }
     if (pass.length<4) { err.textContent='Password must be at least 4 characters.'; return; }
     const users = this.getUsers();
-    if (users[user.toLowerCase()]) { err.textContent='Username already taken.'; return; }
-    users[user.toLowerCase()] = { name, password: btoa(pass) };
-    this.saveUsers(users);
+    if (Object.prototype.hasOwnProperty.call(users,user.toLowerCase())) { err.textContent='Username already taken.'; return; }
+    Object.defineProperty(users,user.toLowerCase(),{value:{name,password:btoa(pass)},writable:true,enumerable:true,configurable:true});
+    if(!this.saveUsers(users)) { err.textContent='Could not save your account on this device.'; return; }
     _currentUser = { username: user.toLowerCase(), name };
-    localStorage.setItem(KEYS.CURRENT, JSON.stringify(_currentUser));
+    Storage.writeJSON(KEYS.CURRENT,_currentUser);
     this._launch();
   },
 
   logout() {
-    localStorage.removeItem(KEYS.CURRENT);
+    Storage.remove(KEYS.CURRENT);
+    AICompanion.cancelPending();
+    BreathingSystem.stopActive();
+    BoostSystem.resetMed();
+    SoundSystem.stopAll();
+    Analytics.destroyCharts();
+    AnalyticsSystem.destroyCharts();
+    MotionSystem.cleanup();
+    TinyResetGames.resetAll();
     _currentUser = null;
-    [_chartMoodTrend,_chartMoodDist,_chartHabit,_chartRptMood,_chartRptHabit]
-      .forEach(c=>{ if(c){c.destroy();} });
-    _chartMoodTrend=_chartMoodDist=_chartHabit=_chartRptMood=_chartRptHabit=null;
     _$('app').classList.add('hidden');
     _$('auth-screen').style.display='flex';
     _$('login-username').value='';
@@ -173,13 +601,22 @@ const AppController = {
 
   /* ── Navigation ────────────────────────────────────────────── */
   navigate(sectionId) {
+    const current=_qs('.page-section.active');
+    const next=_$('section-'+sectionId);
+    if(current && current!==next) {
+      if(_breathActive) BreathingSystem.stopActive();
+      if(current.id==='section-moodboost'&&_medActive) BoostSystem._pauseMed();
+    }
+    if(current?.id==='section-dashboard'&&current.id!=='section-'+sectionId) Analytics.destroyCharts();
+    if(current?.id==='section-report'&&current.id!=='section-'+sectionId) AnalyticsSystem.destroyCharts();
     _qsa('.page-section').forEach(s=>s.classList.remove('active'));
     _qsa('.nav-link').forEach(n=>n.classList.remove('active'));
 
-    const sec = _$('section-'+sectionId);
+    const sec = next;
     const nav = _qs(`[data-section="${sectionId}"]`);
     if (sec) sec.classList.add('active');
     if (nav) nav.classList.add('active');
+    MotionSystem.show(current,sec);
 
     const titles = {
       dashboard:'Dashboard',
@@ -190,16 +627,17 @@ const AppController = {
        moodboost:'Mood Boost',
        recommendations:'Insights',
         report:'Wellness Report',
+        sounds:'Zen Station',
     };
     _setText('topbar-title', titles[sectionId] || 'WALL·E');
 
     if (sectionId==='dashboard') {
       Analytics.updateStats();
       Analytics.updateScore();
-      setTimeout(()=>Analytics.buildCharts(), 80);
+      setTimeout(()=>{ if(_$('section-dashboard')?.classList.contains('active')) Analytics.buildCharts(); }, 80);
     }
     if (sectionId==='report') {
-      setTimeout(()=>AnalyticsSystem.buildReport(), 100);
+      setTimeout(()=>{ if(_$('section-report')?.classList.contains('active')) AnalyticsSystem.buildReport(); }, 100);
     }
 
     /* Close sidebar on mobile */
@@ -216,13 +654,18 @@ const AppController = {
    MOOD SYSTEM
 ══════════════════════════════════════════════════════════════ */
 const MoodSystem = {
-  get()       { const a=JSON.parse(localStorage.getItem(KEYS.MOODS)||'{}'); return a[_currentUser.username]||[]; },
-  save(moods) { const a=JSON.parse(localStorage.getItem(KEYS.MOODS)||'{}'); a[_currentUser.username]=moods; localStorage.setItem(KEYS.MOODS,JSON.stringify(a)); },
+  get()       { return Storage.readUser(KEYS.MOODS,_currentUser.username,[]); },
+  save(moods) { return Storage.writeUser(KEYS.MOODS,_currentUser.username,moods); },
 
   select(btn) {
-    _qsa('.mood-tile').forEach(b=>b.classList.remove('selected'));
+    _qsa('.mood-tile').forEach(b=>{ b.classList.remove('selected'); b.setAttribute('aria-pressed','false'); });
     btn.classList.add('selected');
+    btn.setAttribute('aria-pressed','true');
     _selectedMood = { label: btn.dataset.mood, score: parseInt(btn.dataset.score) };
+    AICompanion.updateAvatar(_selectedMood.label);
+    const feedback=_$('mood-selection-feedback');
+    if(feedback) feedback.textContent=`WALL·E noticed: ${_selectedMood.label.toLowerCase()} feels like the right word.`;
+    MotionSystem.moodReact(btn);
   },
 
   log() {
@@ -232,10 +675,11 @@ const MoodSystem = {
     const entry = { id:Date.now(), mood:_selectedMood.label, score:_selectedMood.score, note, timestamp:new Date().toISOString() };
     const moods = this.get();
     moods.unshift(entry);
-    this.save(moods);
-    _qsa('.mood-tile').forEach(b=>b.classList.remove('selected'));
+    if(!this.save(moods)) { msgEl.textContent='This mood could not be saved on this device.'; msgEl.style.color='var(--c-rose)'; return; }
+    _qsa('.mood-tile').forEach(b=>{ b.classList.remove('selected'); b.setAttribute('aria-pressed','false'); });
     _$('mood-note').value = '';
     _selectedMood = null;
+    _setText('mood-selection-feedback','');
     msgEl.textContent='✓ Mood logged!'; msgEl.style.color='var(--c-emerald)';
     setTimeout(()=>{ msgEl.textContent=''; }, 3000);
     this.render();
@@ -256,21 +700,22 @@ const MoodSystem = {
     const moods = this.get();
     if (!moods.length) { el.innerHTML='<p class="empty-state">No mood entries yet. Log your first mood above!</p>'; return; }
     el.innerHTML = moods.slice(0,20).map(m=>{
+      const mood=MOOD_EMOJI[m.mood]?m.mood:'Neutral';
       const dt  = new Date(m.timestamp);
       const day = dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});
       const hr  = dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
       return `
         <div class="mood-log-entry">
-          <span class="mood-log-emoji">${MOOD_EMOJI[m.mood]}</span>
+          <span class="mood-log-emoji">${MOOD_EMOJI[mood]}</span>
           <div class="mood-log-info">
             <div style="display:flex;align-items:center;gap:8px;">
-              <span class="mood-log-label">${m.mood}</span>
-              <span class="mood-chip ${m.mood}">${m.mood}</span>
+              <span class="mood-log-label">${mood}</span>
+              <span class="mood-chip ${mood}">${mood}</span>
             </div>
             ${m.note?`<p class="mood-log-note">"${_esc(m.note)}"</p>`:''}
           </div>
           <span class="mood-log-time">${day} · ${hr}</span>
-          <button class="mood-log-del" onclick="MoodSystem.delete(${m.id})" title="Delete">✕</button>
+          <button class="mood-log-del" onclick="MoodSystem.delete(${_safeId(m.id)})" title="Delete">✕</button>
         </div>`;
     }).join('');
   },
@@ -282,6 +727,11 @@ const MoodSystem = {
 ══════════════════════════════════════════════════════════════ */
 const Analytics = {
 
+  destroyCharts() {
+    [_chartMoodTrend,_chartMoodDist,_chartHabit].forEach(chart=>chart?.destroy());
+    _chartMoodTrend=_chartMoodDist=_chartHabit=null;
+  },
+
   /* ── Stats Cards ─────────────────────────────────────────── */
   updateStats() {
     const moods    = MoodSystem.get();
@@ -292,10 +742,10 @@ const Analytics = {
 
     const todayMood = moods.find(m=>m.timestamp.startsWith(today));
     _setText('stat-today-mood', todayMood ? `${MOOD_EMOJI[todayMood.mood]} ${todayMood.mood}` : '— Not logged');
-    _setText('stat-journal-count', journal.length);
+    MotionSystem.count(_$('stat-journal-count'),journal.length);
 
     const todayDone = habits.filter(h=>(habitLog[today]||[]).includes(h.id));
-    _setText('stat-habits-today', `${todayDone.length}/${habits.length}`);
+    MotionSystem.count(_$('stat-habits-today'),todayDone.length,n=>`${n}/${habits.length}`);
 
     let streak=0;
     for(let i=0;i<30;i++){
@@ -304,7 +754,7 @@ const Analytics = {
       if((habitLog[k]||[]).length>0) streak++;
       else if(i>0) break;
     }
-    _setText('stat-streak', `${streak} day${streak!==1?'s':''}`);
+    MotionSystem.count(_$('stat-streak'),streak,n=>`${n} day${n!==1?'s':''}`);
 
     /* Dashboard greeting */
     const hr   = new Date().getHours();
@@ -363,9 +813,9 @@ const Analytics = {
 
     /* SVG ring (314 = 2π×50) */
     const ring = _$('ws-ring-fill');
-    if (ring) ring.style.strokeDashoffset = (314 - 314*(total/100));
+    if (ring) MotionSystem.animateRing(ring, total);
 
-    _setText('ws-score-num', total);
+    MotionSystem.count(_$('ws-score-num'),total);
 
     const badge = _$('ws-status-badge');
     if(badge){ badge.textContent=`${emoji} ${label}`; badge.style.color=color; badge.style.borderColor=color+'55'; badge.style.background=color+'18'; }
@@ -406,8 +856,10 @@ const Analytics = {
   },
 
   buildMoodTrend() {
-    const canvas = _$('moodTrendChart'); if(!canvas) return;
+    const canvas = _$('moodTrendChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartMoodTrend) _chartMoodTrend.destroy();
+    const primary=_colorToken('--accent-indigo','#6366f1');
+    const chartText=_colorToken('--text-secondary','#94a3b8');
     const labels=[], data=[], moods=MoodSystem.get();
     for(let i=6;i>=0;i--){
       const d=new Date(); d.setDate(d.getDate()-i);
@@ -421,30 +873,33 @@ const Analytics = {
     if(valid.length>=2){
       const diff=valid[valid.length-1]-valid[0];
       const b=_$('mood-trend-badge');
-      if(b){ b.textContent=diff>0?'↑ Improving':diff<0?'↓ Declining':'→ Stable'; b.style.color=diff>0?'var(--c-emerald)':diff<0?'var(--c-rose)':'var(--text-2)'; b.style.borderColor=diff>0?'rgba(52,211,153,0.4)':diff<0?'rgba(251,113,133,0.4)':'var(--border)'; }
+      if(b){ b.textContent=diff>0?'↑ Improving':diff<0?'↓ Declining':'→ Stable'; b.style.color=diff>0?_colorToken('--c-emerald','#10b981'):diff<0?_colorToken('--c-rose','#f43f5e'):chartText; b.style.borderColor=diff>0?_withAlpha(_colorToken('--c-emerald','#10b981'),'66'):diff<0?_withAlpha(_colorToken('--c-rose','#f43f5e'),'66'):_colorToken('--border','rgba(148,163,184,.15)'); }
     }
     _chartMoodTrend=new Chart(canvas,{
       type:'line',
-      data:{ labels, datasets:[{ data, borderColor:'#34d399', backgroundColor:'rgba(52,211,153,0.08)', borderWidth:2.5, pointBackgroundColor:'#34d399', pointBorderColor:'#041810', pointRadius:5, pointHoverRadius:7, tension:0.4, fill:true, spanGaps:true }] },
-      options:{ responsive:true,maintainAspectRatio:false, scales:{ y:{min:1,max:5,ticks:{color:'#7b8cad',stepSize:1,callback:v=>['','😢','😰','😐','😌','😊'][v]||v},grid:{color:'rgba(255,255,255,0.04)'}}, x:{ticks:{color:'#7b8cad'},grid:{color:'rgba(255,255,255,0.03)'}} }, plugins:{legend:{display:false}} }
+      data:{ labels, datasets:[{ data, borderColor:primary, backgroundColor:_withAlpha(primary,'24'), borderWidth:2, pointBackgroundColor:primary, pointBorderColor:_colorToken('--bg-base','#070a14'), pointRadius:4, pointHoverRadius:6, tension:0.35, fill:true, spanGaps:true }] },
+      options:{ responsive:true,maintainAspectRatio:false, scales:{ y:{min:1,max:5,ticks:{color:chartText,stepSize:1,callback:v=>['','😢','😰','😐','😌','😊'][v]||v},grid:{color:'rgba(148,163,184,.07)'}}, x:{ticks:{color:chartText},grid:{color:'rgba(148,163,184,.05)'}} }, plugins:{legend:{display:false}} }
     });
   },
 
   buildMoodDist() {
-    const canvas=_$('moodDistChart'); if(!canvas) return;
+    const canvas=_$('moodDistChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartMoodDist) _chartMoodDist.destroy();
+    const colors=['--mood-happy','--mood-calm','--mood-neutral','--mood-stressed','--mood-sad'].map((token,index)=>_colorToken(token,['#f59e0b','#0ea5e9','#94a3b8','#818cf8','#6366f1'][index]));
     const counts={Happy:0,Calm:0,Neutral:0,Stressed:0,Sad:0};
     MoodSystem.get().forEach(m=>{if(counts[m.mood]!==undefined)counts[m.mood]++;});
     _chartMoodDist=new Chart(canvas,{
       type:'doughnut',
-      data:{ labels:Object.keys(counts), datasets:[{ data:Object.values(counts), backgroundColor:['rgba(251,191,36,.75)','rgba(56,189,248,.75)','rgba(148,163,184,.6)','rgba(129,140,248,.75)','rgba(251,113,133,.75)'], borderColor:['#fbbf24','#38bdf8','#94a3b8','#818cf8','#fb7185'], borderWidth:2,hoverOffset:8 }] },
-      options:{ responsive:true,maintainAspectRatio:false,cutout:'68%', plugins:{legend:{position:'right',labels:{color:'#7b8cad',padding:12,font:{family:'Plus Jakarta Sans',size:11}}}} }
+      data:{ labels:Object.keys(counts), datasets:[{ data:Object.values(counts), backgroundColor:colors.map(color=>_withAlpha(color,'b8')), borderColor:colors, borderWidth:2,hoverOffset:5 }] },
+      options:{ responsive:true,maintainAspectRatio:false,cutout:'68%', plugins:{legend:{position:'right',labels:{color:_colorToken('--text-secondary','#94a3b8'),padding:12,font:{family:'Plus Jakarta Sans, system-ui, sans-serif',size:12,weight:500}}}} }
     });
   },
 
   buildHabitChart() {
-    const canvas=_$('habitChart'); if(!canvas) return;
+    const canvas=_$('habitChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartHabit) _chartHabit.destroy();
+    const success=_colorToken('--c-emerald','#10b981'), warning=_colorToken('--c-amber','#f59e0b'), info=_colorToken('--c-sky','#0ea5e9');
+    const chartText=_colorToken('--text-secondary','#94a3b8');
     const habits=HabitSystem.get(), habitLog=HabitSystem.getLog();
     const labels=[], data=[];
     for(let i=6;i>=0;i--){
@@ -454,8 +909,8 @@ const Analytics = {
     }
     _chartHabit=new Chart(canvas,{
       type:'bar',
-      data:{ labels, datasets:[{ data, backgroundColor:data.map(v=>v>=80?'rgba(52,211,153,.6)':v>=50?'rgba(251,191,36,.5)':'rgba(129,140,248,.45)'), borderColor:data.map(v=>v>=80?'#34d399':v>=50?'#fbbf24':'#818cf8'), borderWidth:1.5, borderRadius:7 }] },
-      options:{ responsive:true,maintainAspectRatio:false, scales:{ y:{min:0,max:100,ticks:{color:'#7b8cad',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'}}, x:{ticks:{color:'#7b8cad'},grid:{display:false}} }, plugins:{legend:{display:false}} }
+      data:{ labels, datasets:[{ data, backgroundColor:data.map(v=>_withAlpha(v>=80?success:v>=50?info:warning,'a8')), borderColor:data.map(v=>v>=80?success:v>=50?info:warning), borderWidth:1, borderRadius:6 }] },
+      options:{ responsive:true,maintainAspectRatio:false, scales:{ y:{min:0,max:100,ticks:{color:chartText,callback:v=>v+'%'},grid:{color:'rgba(148,163,184,.07)'}}, x:{ticks:{color:chartText},grid:{display:false}} }, plugins:{legend:{display:false}} }
     });
   },
 };
@@ -469,33 +924,32 @@ const AICompanion = {
   /* ── Personality ─────────────────────────────────────────── */
   PERSONALITIES: {
     friend: {
-      name:'Friend Mode', icon:'😊', color:'var(--c-emerald)',
+      name:'Friend Mode', icon:'😊', color:'#f59e0b',
       pre:['Hey! ','Aw, ','Oh friend — ','Honestly? ','You know what? '],
       suf:[' You\'ve got this! 💙',' I\'m right here for you.',' Sending good vibes! ✨',' You\'re not alone.',''],
-      face:'🤗', glow:'rgba(52,211,153,0.35)', label:'Your supportive friend',
+      face:'🤗', glow:'rgba(245,158,11,0.22)', label:'Your supportive friend',
     },
     therapist: {
-      name:'Therapist Mode', icon:'🧠', color:'var(--c-violet)',
+      name:'Therapist Mode', icon:'🧠', color:'#8b5cf6',
       pre:['I hear you. ','That\'s meaningful. ','Let\'s sit with that — ','I appreciate you sharing. ','I notice '],
       suf:[' What comes up for you around that?',' How long have you felt this way?',' What does that mean for you?',' I wonder what that\'s like for you.',''],
-      face:'🧘', glow:'rgba(129,140,248,0.35)', label:'Your reflective therapist',
+      face:'🧘', glow:'rgba(139,92,246,0.22)', label:'Your reflective therapist',
     },
     motivator: {
-      name:'Motivator Mode', icon:'🚀', color:'var(--c-amber)',
+      name:'Motivator Mode', icon:'🚀', color:'#38bdf8',
       pre:['YES! ','LISTEN — ','This is your moment! ','Champions do this: ','No limits! '],
       suf:[' Now GO! 💪',' You have everything it takes!',' The world needs your energy!',' Every setback is a comeback setup!',''],
-      face:'🔥', glow:'rgba(251,191,36,0.4)', label:'Your personal motivator',
+      face:'🔥', glow:'rgba(56,189,248,0.22)', label:'Your personal motivator',
     },
   },
 
   getPersonality() {
-    const a=JSON.parse(localStorage.getItem(KEYS.PERSONALITY)||'{}');
-    return a[_currentUser?.username]||'friend';
+    const mode=Storage.readUser(KEYS.PERSONALITY,_currentUser?.username,'friend');
+    return this.PERSONALITIES[mode] ? mode : 'friend';
   },
   savePersonality(mode) {
-    const a=JSON.parse(localStorage.getItem(KEYS.PERSONALITY)||'{}');
-    a[_currentUser.username]=mode;
-    localStorage.setItem(KEYS.PERSONALITY,JSON.stringify(a));
+    if(!this.PERSONALITIES[mode]) return false;
+    return Storage.writeUser(KEYS.PERSONALITY,_currentUser.username,mode);
   },
   applyPersonality(text) {
     const mode=this.getPersonality();
@@ -509,6 +963,7 @@ const AICompanion = {
   },
 
   setPersonality(mode) {
+    if(!this.PERSONALITIES[mode]) mode='friend';
     this.savePersonality(mode);
     _qsa('.pbar-btn').forEach(b=>{
       b.classList.remove('active','mode-friend','mode-therapist','mode-motivator');
@@ -526,10 +981,11 @@ const AICompanion = {
     if(r2)   r2.style.borderColor=cfg.color+'18';
   },
 
-  updateAvatar() {
-    const moods=MoodSystem.get(); if(!moods.length) return;
-    const latest=moods[0].mood;
-    const map={ Happy:{face:'🥰',glow:'rgba(251,191,36,0.42)',lbl:'Sharing your joy!'}, Calm:{face:'😌',glow:'rgba(56,189,248,0.32)',lbl:'At peace with you'}, Neutral:{face:'🤖',glow:'rgba(52,211,153,0.28)',lbl:'Ready to listen'}, Stressed:{face:'😟',glow:'rgba(129,140,248,0.42)',lbl:'Here to help you calm down'}, Sad:{face:'🥺',glow:'rgba(251,113,133,0.38)',lbl:'Sending you a hug 💙'} };
+  updateAvatar(moodOverride) {
+    const moods=MoodSystem.get();
+    const latest=moodOverride || moods[0]?.mood;
+    if(!latest) return;
+    const map={ Happy:{face:'🥰',glow:'rgba(245,158,11,0.25)',lbl:'Sharing your joy!'}, Calm:{face:'😌',glow:'rgba(14,165,233,0.25)',lbl:'At peace with you'}, Neutral:{face:'🤖',glow:'rgba(148,163,184,0.20)',lbl:'Ready to listen'}, Stressed:{face:'😟',glow:'rgba(129,140,248,0.22)',lbl:'Here to help you calm down'}, Sad:{face:'🥺',glow:'rgba(99,102,241,0.22)',lbl:'Sending you a hug 💙'} };
     const r=map[latest]||map.Neutral;
     const face=_$('avatar-face'), glow=_$('avatar-glow'), lbl=_$('avatar-mood-txt');
     if(face) face.textContent=r.face;
@@ -601,8 +1057,14 @@ const AICompanion = {
   },
 
   /* ── Chat persistence ─────────────────────────────────── */
-  getHistory() { const a=JSON.parse(localStorage.getItem(KEYS.CHAT)||'{}'); return a[_currentUser.username]||[]; },
-  saveHistory(h){ const a=JSON.parse(localStorage.getItem(KEYS.CHAT)||'{}'); a[_currentUser.username]=h.slice(-80); localStorage.setItem(KEYS.CHAT,JSON.stringify(a)); },
+  getHistory() { return Storage.readUser(KEYS.CHAT,_currentUser.username,[]); },
+  saveHistory(h){ return Storage.writeUser(KEYS.CHAT,_currentUser.username,h.slice(-80)); },
+
+  cancelPending() {
+    _chatReplyTimers.forEach(timer=>clearTimeout(timer));
+    _chatReplyTimers.clear();
+    _qsa('.typing-pending').forEach(typing=>typing.remove());
+  },
 
   /* ── Chat render ──────────────────────────────────────── */
   init() {
@@ -620,7 +1082,7 @@ const AICompanion = {
     this.updateAvatar();
     /* Attach breathing circle listener for insights page */
     const bc2=_$('breathing-circle-2');
-    if(bc2) bc2.addEventListener('click', ()=>BreathingSystem.toggle('breathing-circle-2','breathing-label-2','breathing-instruction-2'));
+    if(bc2) bc2.onclick=()=>BreathingSystem.toggle('breathing-circle-2','breathing-label-2','breathing-instruction-2');
   },
 
   _renderMsg(msg, container) {
@@ -628,21 +1090,20 @@ const AICompanion = {
     const time=new Date(msg.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
     const div=document.createElement('div');
     div.className=`chat-msg ${isUser?'user':'bot'}`;
-    div.innerHTML=`
-      <div class="chat-msg-avatar">${isUser?_currentUser.name[0].toUpperCase():'🤖'}</div>
-      <div>
-        <div class="chat-bubble">${_esc(msg.text)}</div>
-        <div class="chat-msg-time">${time}</div>
-      </div>`;
+    div.innerHTML='<div class="chat-msg-avatar"></div><div><div class="chat-bubble"></div><div class="chat-msg-time"></div></div>';
+    div.querySelector('.chat-msg-avatar').textContent=isUser?_currentUser.name[0].toUpperCase():'🤖';
+    div.querySelector('.chat-bubble').textContent=String(msg.text??'');
+    div.querySelector('.chat-msg-time').textContent=time;
     container.appendChild(div);
     container.scrollTop=container.scrollHeight;
   },
 
   _showTyping(container) {
     const el=document.createElement('div');
-    el.id='typing-indicator'; el.className='chat-msg bot';
+    el.className='chat-msg bot typing-pending';
     el.innerHTML=`<div class="chat-msg-avatar">🤖</div><div class="chat-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
     container.appendChild(el); container.scrollTop=container.scrollHeight;
+    return el;
   },
 
   send() {
@@ -652,23 +1113,26 @@ const AICompanion = {
     this._renderMsg(userMsg, container);
     const h=this.getHistory(); h.push(userMsg); this.saveHistory(h);
     input.value='';
-    this._showTyping(container);
-    setTimeout(()=>{
-      const ind=_$('typing-indicator'); if(ind) ind.remove();
+    const typing=this._showTyping(container);
+    const replyTimer=setTimeout(()=>{
+      _chatReplyTimers.delete(replyTimer);
+      typing.remove();
+      if(!_currentUser) return;
       const botMsg={ role:'bot', text:this.generateResponse(text), time:new Date().toISOString() };
       this._renderMsg(botMsg, container);
       const h2=this.getHistory(); h2.push(botMsg); this.saveHistory(h2);
       Analytics.updateScore();
     }, 700+Math.random()*900);
+    _chatReplyTimers.add(replyTimer);
   },
 
   handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); this.send(); } },
 
   clearChat() {
     if(!confirm('Clear all chat history?')) return;
-    const a=JSON.parse(localStorage.getItem(KEYS.CHAT)||'{}');
-    delete a[_currentUser.username];
-    localStorage.setItem(KEYS.CHAT,JSON.stringify(a));
+    this.cancelPending();
+    const a=Storage.readJSON(KEYS.CHAT,{});
+    if(a&&typeof a==='object'&&!Array.isArray(a)) { delete a[_currentUser.username]; Storage.writeJSON(KEYS.CHAT,a); }
     this.init();
   },
 };
@@ -678,10 +1142,8 @@ const AICompanion = {
    JOURNAL SYSTEM
 ══════════════════════════════════════════════════════════════ */
 const JournalSystem = {
-  get()       { const a=JSON.parse(localStorage.getItem(KEYS.JOURNAL)||'{}'); return a[_currentUser.username]||[]; },
-  save(e)     { const a=JSON.parse(localStorage.getItem(KEYS.JOURNAL)||'{}'); a[_currentUser.username]=e; localStorage.setItem(KEYS.JOURNAL,JSON.stringify(a)); },
-
-  save_entry() { /* alias kept for HTML compat – renamed below */ this.saveEntry(); },
+  get()       { return Storage.readUser(KEYS.JOURNAL,_currentUser.username,[]); },
+  save(e)     { return Storage.writeUser(KEYS.JOURNAL,_currentUser.username,e); },
 
   saveEntry() {
     const title=_$('journal-title').value.trim();
@@ -693,11 +1155,10 @@ const JournalSystem = {
     if(_editJournalId){
       const idx=entries.findIndex(e=>e.id===_editJournalId);
       if(idx!==-1){ entries[idx].title=title; entries[idx].body=body; entries[idx].edited=new Date().toISOString(); }
-      _editJournalId=null;
     } else {
       entries.unshift({ id:Date.now(), title, body, timestamp:new Date().toISOString() });
     }
-    this.save(entries);
+    if(!this.save(entries)) { msgEl.textContent='This entry could not be saved on this device.'; msgEl.style.color='var(--c-rose)'; return; }
     this.clearForm();
     this.renderList();
     Analytics.updateStats();
@@ -743,27 +1204,22 @@ const JournalSystem = {
           </div>
           <p class="journal-entry-preview">${_esc(preview)}</p>
           <div class="journal-entry-actions">
-            <button class="btn-tiny edit" onclick="JournalSystem.edit(${e.id})">✎ Edit</button>
-            <button class="btn-tiny del"  onclick="JournalSystem.delete(${e.id})">✕ Delete</button>
+            <button class="btn-tiny edit" onclick="JournalSystem.edit(${_safeId(e.id)})">✎ Edit</button>
+            <button class="btn-tiny del"  onclick="JournalSystem.delete(${_safeId(e.id)})">✕ Delete</button>
           </div>
         </div>`;
     }).join('');
   },
 };
 
-/* HTML button aliases */
-function saveJournalEntry() { JournalSystem.saveEntry(); }
-function clearJournalForm()  { JournalSystem.clearForm(); }
-
-
 /* ══════════════════════════════════════════════════════════════
    HABIT SYSTEM
 ══════════════════════════════════════════════════════════════ */
 const HabitSystem = {
-  get()       { const a=JSON.parse(localStorage.getItem(KEYS.HABITS)||'{}'); return a[_currentUser.username]||[]; },
-  save(h)     { const a=JSON.parse(localStorage.getItem(KEYS.HABITS)||'{}'); a[_currentUser.username]=h; localStorage.setItem(KEYS.HABITS,JSON.stringify(a)); },
-  getLog()    { const a=JSON.parse(localStorage.getItem(KEYS.HABIT_LOG)||'{}'); return a[_currentUser.username]||{}; },
-  saveLog(l)  { const a=JSON.parse(localStorage.getItem(KEYS.HABIT_LOG)||'{}'); a[_currentUser.username]=l; localStorage.setItem(KEYS.HABIT_LOG,JSON.stringify(a)); },
+  get()       { return Storage.readUser(KEYS.HABITS,_currentUser.username,[]); },
+  save(h)     { return Storage.writeUser(KEYS.HABITS,_currentUser.username,h); },
+  getLog()    { return Storage.readUser(KEYS.HABIT_LOG,_currentUser.username,{}); },
+  saveLog(l)  { return Storage.writeUser(KEYS.HABIT_LOG,_currentUser.username,l); },
 
   add() {
     const input=_$('new-habit-input'); const icon=_$('new-habit-icon').value; const name=input.value.trim();
@@ -798,10 +1254,10 @@ const HabitSystem = {
       const done=today.includes(h.id);
       return `
         <div class="habit-row ${done?'done':''}">
-          <div class="habit-checkbox" onclick="HabitSystem.toggle(${h.id})">${done?'✓':''}</div>
-          <span class="habit-icon">${h.icon}</span>
+          <button type="button" class="habit-checkbox" aria-pressed="${done}" aria-label="Mark ${_esc(h.name)} ${done?'incomplete':'complete'}" onclick="HabitSystem.toggle(${_safeId(h.id)})">${done?'✓':''}</button>
+          <span class="habit-icon">${_esc(String(h.icon??''))}</span>
           <span class="habit-name">${_esc(h.name)}</span>
-          <button class="habit-del" onclick="HabitSystem.delete(${h.id})" title="Delete">✕</button>
+          <button class="habit-del" onclick="HabitSystem.delete(${_safeId(h.id)})" title="Delete">✕</button>
         </div>`;
     }).join('');
   },
@@ -828,6 +1284,10 @@ const HabitSystem = {
 const BreathingSystem = {
   _activeId: null,
 
+  stopActive() {
+    if(_breathActive) this._stop(this._circleId,this._labelId,this._instrId);
+  },
+
   toggle(circleId='breathing-circle', labelId='breathing-label', instructionId='breathing-instruction') {
     if(_breathActive && this._activeId===circleId) {
       this._stop(circleId, labelId, instructionId);
@@ -840,6 +1300,7 @@ const BreathingSystem = {
   _start(cid, lid, iid) {
     _breathActive=true; _breathPhase=0; _breathCycles=0;
     this._activeId=cid; this._circleId=cid; this._labelId=lid; this._instrId=iid;
+    const circle=_$(cid); if(circle) { circle.setAttribute('aria-pressed','true'); circle.setAttribute('aria-label','Stop guided breathing'); }
     this._run(cid, lid, iid);
   },
 
@@ -859,9 +1320,9 @@ const BreathingSystem = {
   },
 
   _stop(cid, lid, iid) {
-    clearTimeout(_breathTimer); _breathActive=false; this._activeId=null;
+    clearTimeout(_breathTimer); _breathTimer=null; _breathActive=false; this._activeId=null;
     const circle=_$(cid), label=_$(lid), instr=_$(iid);
-    if(circle) circle.className='breathing-circle';
+    if(circle) { circle.className='breathing-circle'; circle.setAttribute('aria-pressed','false'); circle.setAttribute('aria-label','Start guided breathing'); }
     if(label)  label.textContent='Tap to Start';
     if(instr)  instr.textContent = _breathCycles>=BREATH_MAX
       ? '✓ Session complete! Great job.'
@@ -878,7 +1339,7 @@ const BoostSystem = {
   init() {
     /* Attach breathing circle */
     const bc=_$('breathing-circle');
-    if(bc) bc.addEventListener('click', ()=>BreathingSystem.toggle());
+    if(bc) bc.onclick=()=>BreathingSystem.toggle();
     /* Init affirmation */
     this._nextBigAffImpl();
     /* Render gratitude history */
@@ -888,8 +1349,8 @@ const BoostSystem = {
   },
 
   /* ── Gratitude ─────────────────────────────────────────── */
-  _getGrat()       { const a=JSON.parse(localStorage.getItem(KEYS.GRATITUDE)||'{}'); return a[_currentUser.username]||[]; },
-  _saveGrat(list)  { const a=JSON.parse(localStorage.getItem(KEYS.GRATITUDE)||'{}'); a[_currentUser.username]=list.slice(0,30); localStorage.setItem(KEYS.GRATITUDE,JSON.stringify(a)); },
+  _getGrat()       { return Storage.readUser(KEYS.GRATITUDE,_currentUser.username,[]); },
+  _saveGrat(list)  { return Storage.writeUser(KEYS.GRATITUDE,_currentUser.username,list.slice(0,30)); },
 
   saveGratitude() {
     const g1=_$('grat-1').value.trim(), g2=_$('grat-2').value.trim(), g3=_$('grat-3').value.trim();
@@ -947,20 +1408,20 @@ const BoostSystem = {
   },
 
   _pauseMed() {
-    _medActive=false; clearInterval(_medInterval);
+    _medActive=false; clearInterval(_medInterval); _medInterval=null;
     _$('med-btn').textContent='▶ Resume';
     _setText('med-phase', 'Paused — press Resume when ready');
   },
 
   _finishMed() {
-    clearInterval(_medInterval); _medActive=false;
+    clearInterval(_medInterval); _medInterval=null; _medActive=false;
     _$('med-btn').textContent='▶ Start';
     _setText('med-phase', '🎉 Session complete! Take a moment in the stillness.');
     const prog=_$('med-prog'); if(prog) prog.style.strokeDashoffset=0;
   },
 
   resetMed() {
-    clearInterval(_medInterval); _medActive=false; _medPhaseIdx=0; _medPhaseTick=0;
+    clearInterval(_medInterval); _medInterval=null; _medActive=false; _medPhaseIdx=0; _medPhaseTick=0;
     const active=_qs('.dur-btn.active');
     _medSecsTotal=(active?parseInt(active.dataset.min):3)*60; _medSecsLeft=_medSecsTotal;
     _$('med-btn').textContent='▶ Start';
@@ -1020,6 +1481,11 @@ const BoostSystem = {
 ══════════════════════════════════════════════════════════════ */
 const AnalyticsSystem = {
 
+  destroyCharts() {
+    [_chartRptMood,_chartRptHabit].forEach(chart=>chart?.destroy());
+    _chartRptMood=_chartRptHabit=null;
+  },
+
   /* ── Recommendations ────────────────────────────────────── */
   RECS: {
     Happy:   [{ icon:'📓',title:'Capture this moment',    desc:'Write in your journal while happy — positive memories anchor you on harder days.',type:'boost'},{ icon:'🤝',title:'Spread the good vibes',   desc:'Share your happiness. Call a friend, send a kind message, or pay a compliment.',type:'boost'},{ icon:'🏆',title:'Set an ambitious goal',    desc:'Positive moods boost creative thinking. Use this energy to plan something exciting!',type:'boost'}],
@@ -1032,8 +1498,9 @@ const AnalyticsSystem = {
   renderRecommendations() {
     const el=_$('recommendations-container'), moods=MoodSystem.get();
     let dominant='Neutral';
-    if(moods.length){
-      const recent=moods.slice(0,3), freq={};
+    const validMoods=moods.filter(m=>Object.prototype.hasOwnProperty.call(MOOD_EMOJI,m.mood));
+    if(validMoods.length){
+      const recent=validMoods.slice(0,3), freq={};
       recent.forEach(m=>{ freq[m.mood]=(freq[m.mood]||0)+1; });
       dominant=Object.keys(freq).sort((a,b)=>freq[b]-freq[a])[0];
     }
@@ -1148,16 +1615,19 @@ const AnalyticsSystem = {
   },
 
   _buildRptMoodChart(moodCounts) {
-    const canvas=_$('reportMoodChart'); if(!canvas) return;
+    const canvas=_$('reportMoodChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartRptMood) _chartRptMood.destroy();
-    _chartRptMood=new Chart(canvas,{ type:'doughnut', data:{ labels:Object.keys(moodCounts), datasets:[{ data:Object.values(moodCounts), backgroundColor:['rgba(251,191,36,.75)','rgba(56,189,248,.75)','rgba(148,163,184,.6)','rgba(129,140,248,.75)','rgba(251,113,133,.75)'], borderColor:['#fbbf24','#38bdf8','#94a3b8','#818cf8','#fb7185'], borderWidth:2,hoverOffset:8 }] }, options:{ responsive:true,maintainAspectRatio:false,cutout:'65%', plugins:{legend:{position:'right',labels:{color:'#7b8cad',padding:10,font:{family:'Plus Jakarta Sans',size:11}}}} } });
+    const colors=['--mood-happy','--mood-calm','--mood-neutral','--mood-stressed','--mood-sad'].map((token,index)=>_colorToken(token,['#f59e0b','#0ea5e9','#94a3b8','#818cf8','#6366f1'][index]));
+    _chartRptMood=new Chart(canvas,{ type:'doughnut', data:{ labels:Object.keys(moodCounts), datasets:[{ data:Object.values(moodCounts), backgroundColor:colors.map(color=>_withAlpha(color,'b8')), borderColor:colors, borderWidth:2,hoverOffset:5 }] }, options:{ responsive:true,maintainAspectRatio:false,cutout:'65%', plugins:{legend:{position:'right',labels:{color:_colorToken('--text-secondary','#94a3b8'),padding:12,font:{family:'Plus Jakarta Sans, system-ui, sans-serif',size:12,weight:500}}}} } });
   },
 
   _buildRptHabitChart(wkTotals, wkPoss) {
-    const canvas=_$('reportHabitChart'); if(!canvas) return;
+    const canvas=_$('reportHabitChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartRptHabit) _chartRptHabit.destroy();
+    const success=_colorToken('--c-emerald','#10b981'), warning=_colorToken('--c-amber','#f59e0b'), info=_colorToken('--c-sky','#0ea5e9');
+    const chartText=_colorToken('--text-secondary','#94a3b8');
     const pcts=wkTotals.map((t,i)=>wkPoss[i]?Math.round((t/wkPoss[i])*100):0);
-    _chartRptHabit=new Chart(canvas,{ type:'bar', data:{ labels:['Week 1','Week 2','Week 3','Week 4'], datasets:[{ data:pcts, backgroundColor:pcts.map(v=>v>=80?'rgba(52,211,153,.65)':v>=50?'rgba(251,191,36,.55)':'rgba(129,140,248,.5)'), borderColor:pcts.map(v=>v>=80?'#34d399':v>=50?'#fbbf24':'#818cf8'), borderWidth:1.5,borderRadius:7 }] }, options:{ responsive:true,maintainAspectRatio:false, scales:{ y:{min:0,max:100,ticks:{color:'#7b8cad',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'}}, x:{ticks:{color:'#7b8cad'},grid:{display:false}} }, plugins:{legend:{display:false}} } });
+    _chartRptHabit=new Chart(canvas,{ type:'bar', data:{ labels:['Week 1','Week 2','Week 3','Week 4'], datasets:[{ data:pcts, backgroundColor:pcts.map(v=>_withAlpha(v>=80?success:v>=50?info:warning,'a8')), borderColor:pcts.map(v=>v>=80?success:v>=50?info:warning), borderWidth:1,borderRadius:6 }] }, options:{ responsive:true,maintainAspectRatio:false, scales:{ y:{min:0,max:100,ticks:{color:chartText,callback:v=>v+'%'},grid:{color:'rgba(148,163,184,.07)'}}, x:{ticks:{color:chartText},grid:{display:false}} }, plugins:{legend:{display:false}} } });
   },
 
   downloadReport() {
@@ -1195,36 +1665,61 @@ const SoundSystem = {
   },
 
   toggle(id) {
+    if(!Object.prototype.hasOwnProperty.call(this.library,id)) return;
     // Using your _qs and _$ helpers
     const card = _qs(`[onclick*="toggle('${id}')"]`);
     const btn = _$( `btn-${id}`);
+    const setControlState = (playing, loading=false) => {
+      if(!btn) return;
+      const label=(btn.getAttribute('aria-label')||'Play sound').replace(/^(Play|Pause) /,'');
+      btn.textContent=playing?'⏸':'▶';
+      btn.setAttribute('aria-label',`${playing?'Pause':'Play'} ${label}`);
+      btn.setAttribute('aria-pressed',String(playing));
+      if(loading) btn.setAttribute('aria-busy','true'); else btn.removeAttribute('aria-busy');
+    };
 
     if (this.activeSounds[id]) {
       // If currently playing: Stop it
       this.activeSounds[id].pause();
       delete this.activeSounds[id];
       if(card) card.classList.remove('active');
-      if(btn) btn.textContent = "▶";
+      setControlState(false);
     } else {
       // If not playing: Start it
-      const audio = new Audio(this.library[id]);
+      if(typeof Audio==='undefined') return;
+      let audio;
+      try { audio=new Audio(this.library[id]); }
+      catch(error) { console.warn(`WALL·E could not load the ${id} sound.`,error); return; }
       audio.loop = true;
       
       // Look for the volume slider inside this card
       const slider = card ? card.querySelector('.volume-slider') : null;
       audio.volume = slider ? parseFloat(slider.value) : 0.5;
       
-      audio.play().catch(e => console.log("Audio play blocked until user interaction."));
-      
       this.activeSounds[id] = audio;
-      if(card) card.classList.add('active');
-      if(btn) btn.textContent = "⏸";
+      setControlState(false,true);
+      audio.addEventListener('error',()=>{
+        audio.pause();
+        delete this.activeSounds[id];
+        if(card) card.classList.remove('active');
+        setControlState(false);
+      },{once:true});
+      audio.play().then(()=>{
+        if(this.activeSounds[id]!==audio) return;
+        if(card) card.classList.add('active');
+        setControlState(true);
+      }).catch(error=>{
+        delete this.activeSounds[id];
+        if(card) card.classList.remove('active');
+        setControlState(false);
+        console.warn(`WALL·E could not play the ${id} sound.`,error);
+      });
     }
   },
 
   setVolume(id, val) {
     if (this.activeSounds[id]) {
-      this.activeSounds[id].volume = parseFloat(val);
+      this.activeSounds[id].volume = Math.min(1,Math.max(0,parseFloat(val)||0));
     }
   },
 
@@ -1234,7 +1729,12 @@ const SoundSystem = {
       const card = _qs(`[onclick*="toggle('${id}')"]`);
       const btn = _$( `btn-${id}`);
       if(card) card.classList.remove('active');
-      if(btn) btn.textContent = "▶";
+      if(btn) {
+        btn.textContent="▶";
+        btn.setAttribute('aria-label',(btn.getAttribute('aria-label')||'Pause sound').replace(/^Pause /,'Play '));
+        btn.setAttribute('aria-pressed','false');
+        btn.removeAttribute('aria-busy');
+      }
     });
     this.activeSounds = {};
   }
@@ -1244,19 +1744,28 @@ const SoundSystem = {
    INITIALIZATION
 ══════════════════════════════════════════════════════════════ */
 function init() {
+  MotionSystem.init();
+  TinyResetGames.init();
+  if(typeof Chart!=='undefined') {
+    Chart.defaults.font.family="'Plus Jakarta Sans', system-ui, sans-serif";
+    Chart.defaults.font.size=12;
+    Chart.defaults.font.weight=500;
+    Chart.defaults.color='#94a3b8';
+  }
+
   /* Seed demo account */
   const users=AppController.getUsers();
   if(!Object.keys(users).length){
-    users['demo']={ name:'Demo User', password:btoa('demo1234') };
+    Object.defineProperty(users,'demo',{value:{name:'Demo User',password:btoa('demo1234')},writable:true,enumerable:true,configurable:true});
     AppController.saveUsers(users);
   }
 
   /* Restore session */
-  const saved=localStorage.getItem(KEYS.CURRENT);
+  const saved=Storage.readJSON(KEYS.CURRENT,null);
   if(saved){
-    try { _currentUser=JSON.parse(saved); AppController._launch(); }
-    catch { localStorage.removeItem(KEYS.CURRENT); }
+    if(typeof saved.username==='string'&&typeof saved.name==='string'&&saved.name.trim()) { _currentUser=saved; AppController._launch(); }
+    else Storage.remove(KEYS.CURRENT);
   }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', init, {once:true});
