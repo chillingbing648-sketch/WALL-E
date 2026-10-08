@@ -528,6 +528,21 @@ const AppController = {
     _$('signup-error').textContent = '';
   },
 
+  startJourney() {
+    const user = _$('login-username')?.value.trim();
+    const pass = _$('login-password')?.value;
+    if (user && pass) {
+      this.login();
+      return;
+    }
+    if (!_$('login-form').classList.contains('active')) {
+      this.toggleAuth();
+    }
+    if (_$('login-username')) _$('login-username').value = 'demo';
+    if (_$('login-password')) _$('login-password').value = 'demo1234';
+    this.login();
+  },
+
   login() {
     const user = _$('login-username').value.trim();
     const pass = _$('login-password').value;
@@ -568,6 +583,8 @@ const AppController = {
     AnalyticsSystem.destroyCharts();
     MotionSystem.cleanup();
     TinyResetGames.resetAll();
+    const chatContainer = _$('chat-messages');
+    if (chatContainer) chatContainer.innerHTML = '';
     _currentUser = null;
     _$('app').classList.add('hidden');
     _$('auth-screen').style.display='flex';
@@ -625,18 +642,48 @@ const AppController = {
     MotionSystem.show(current,sec);
 
     const titles = {
-      dashboard:'Dashboard',
-       mood:'Mood Tracker',
-        chat:'AI Companion',
-         journal:'Wellness Journal',
-       habits:'Habit Tracker',
-       moodboost:'Mood Boost',
-       garden:'Memory Garden',
-       recommendations:'Insights',
-        report:'Wellness Report',
-        sounds:'Zen Station',
+      dashboard: 'Dashboard',
+      mood: 'Mood Tracker',
+      chat: 'AI Companion',
+      journal: 'Wellness Journal',
+      habits: 'Habit Tracker',
+      moodboost: 'Mood Boost',
+      garden: 'Memory Garden',
+      recommendations: 'Insights',
+      report: 'Wellness Report',
+      sounds: 'Zen Station',
     };
-    _setText('topbar-title', titles[sectionId] || 'WALL·E');
+    const subtitles = {
+      dashboard: "Take a deep breath. You're doing great.",
+      mood: 'How are you feeling today? Check in gently.',
+      chat: 'Your calm, listening space companion.',
+      journal: "Write what's on your mind. Free of judgment.",
+      habits: 'Care over streaks. Small daily rhythms.',
+      moodboost: 'Science-backed exercises to reset your mind.',
+      garden: 'Your living sanctuary of growth and wins.',
+      recommendations: 'Gentle patterns and personalized guidance.',
+      report: 'Reflecting on your wellness progress.',
+      sounds: 'Ambient soundscapes to soothe your focus.',
+    };
+    const greetEl = _$('topbar-greeting-text');
+    const subEl = _$('topbar-subtext');
+    const sunEl = _qs('.topbar-sun-icon');
+    if (greetEl) {
+      if (sectionId === 'dashboard') {
+        const hr = new Date().getHours();
+        const tod = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
+        const first = _currentUser ? _currentUser.name.split(' ')[0] : 'there';
+        greetEl.textContent = `Good ${tod}, ${first}!`;
+        if (subEl) subEl.textContent = subtitles.dashboard;
+        if (sunEl) sunEl.style.display = 'inline';
+      } else {
+        greetEl.textContent = titles[sectionId] || 'WALL·E';
+        if (subEl) subEl.textContent = subtitles[sectionId] || '';
+        if (sunEl) sunEl.style.display = 'none';
+      }
+    } else {
+      _setText('topbar-title', titles[sectionId] || 'WALL·E');
+    }
 
     if (sectionId==='dashboard') {
       Analytics.updateStats();
@@ -793,13 +840,48 @@ const Analytics = {
       }
     }
 
-    /* Dashboard greeting */
+    /* Sanctuary Floating Mood Card */
+    if (todayMood) {
+      _setText('sanctuary-mood-emoji', MOOD_EMOJI[todayMood.mood] || '😌');
+      _setText('sanctuary-mood-title', todayMood.mood);
+      const energyMap = {
+        Happy: 'Energy: High & Bright',
+        Calm: 'Energy: Centered & Calm',
+        Neutral: 'Energy: Steady',
+        Stressed: 'Energy: High Tension',
+        Sad: 'Energy: Quiet & Tender'
+      };
+      _setText('sanctuary-mood-energy', energyMap[todayMood.mood] || 'Energy: Steady');
+      const aura = _$('sanctuary-aura');
+      if (aura) {
+        const auraColors = {
+          Happy: 'radial-gradient(circle, rgba(245, 158, 11, 0.35), transparent 70%)',
+          Calm: 'radial-gradient(circle, rgba(56, 189, 248, 0.3), transparent 70%)',
+          Neutral: 'radial-gradient(circle, rgba(148, 163, 184, 0.25), transparent 70%)',
+          Stressed: 'radial-gradient(circle, rgba(129, 140, 248, 0.3), transparent 70%)',
+          Sad: 'radial-gradient(circle, rgba(99, 102, 241, 0.3), transparent 70%)'
+        };
+        aura.style.background = auraColors[todayMood.mood] || '';
+      }
+    } else {
+      _setText('sanctuary-mood-emoji', '🌱');
+      _setText('sanctuary-mood-title', 'Unchecked');
+      _setText('sanctuary-mood-energy', 'Ready for today');
+      const aura = _$('sanctuary-aura');
+      if (aura) aura.style.background = 'radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 70%)';
+    }
+
+    /* Dashboard greeting & topbar */
     const hr   = new Date().getHours();
     const tod  = hr<12?'Morning':hr<17?'Afternoon':'Evening';
     const ws   = this.calcScore();
     const { emoji, label } = this.scoreLabel(ws.total);
     const el = _$('dashboard-greeting');
     if (el) el.textContent = `Good ${tod}, ${_currentUser.name.split(' ')[0]}! — ${emoji} ${label}`;
+    const topGreet = _$('topbar-greeting-text');
+    if (topGreet && _qs('.page-section.active')?.id === 'section-dashboard') {
+      topGreet.textContent = `Good ${tod.toLowerCase()}, ${_currentUser.name.split(' ')[0]}!`;
+    }
   },
 
   /* ── Wellness Score ──────────────────────────────────────── */
@@ -880,7 +962,7 @@ const Analytics = {
     _setText('sidebar-ws-status', `${emoji} ${label}`);
 
     /* Topbar pill */
-    _setText('ws-topbar-val', `⬡ ${total}%`);
+    _setText('ws-topbar-val', `${total}%`);
 
     return { total, moodPct, habitPct, journalPct, chatPct };
   },
@@ -961,10 +1043,10 @@ const AICompanion = {
   /* ── Personality ─────────────────────────────────────────── */
   PERSONALITIES: {
     friend: {
-      name:'Friend Mode', icon:'😊', color:'#f59e0b',
+      name:'Friend Mode', icon:'😊', color:'#38bdf8',
       pre:['Hey! ','Aw, ','Oh friend — ','Honestly? ','You know what? '],
       suf:[' You\'ve got this! 💙',' I\'m right here for you.',' Sending good vibes! ✨',' You\'re not alone.',''],
-      face:'🤗', glow:'rgba(245,158,11,0.22)', label:'Your supportive friend',
+      face:'🤗', glow:'rgba(56,189,248,0.22)', label:'Your supportive friend',
     },
     therapist: {
       name:'Therapist Mode', icon:'🧠', color:'#8b5cf6',
@@ -973,10 +1055,10 @@ const AICompanion = {
       face:'🧘', glow:'rgba(139,92,246,0.22)', label:'Your reflective therapist',
     },
     motivator: {
-      name:'Motivator Mode', icon:'🚀', color:'#38bdf8',
+      name:'Motivator Mode', icon:'🚀', color:'#06b6d4',
       pre:['YES! ','LISTEN — ','This is your moment! ','Champions do this: ','No limits! '],
       suf:[' Now GO! 💪',' You have everything it takes!',' The world needs your energy!',' Every setback is a comeback setup!',''],
-      face:'🔥', glow:'rgba(56,189,248,0.22)', label:'Your personal motivator',
+      face:'🔥', glow:'rgba(6,182,212,0.22)', label:'Your personal motivator',
     },
   },
 
@@ -991,7 +1073,16 @@ const AICompanion = {
   applyPersonality(text) {
     const mode=this.getPersonality();
     const cfg=this.PERSONALITIES[mode]; if(!cfg) return text;
-    return _rand(cfg.pre)+text+' '+_rand(cfg.suf);
+    const pre = _rand(cfg.pre) || '';
+    const suf = _rand(cfg.suf) || '';
+    let result = String(text || '').trim();
+    if (pre && !result.toLowerCase().startsWith(pre.trim().toLowerCase())) {
+      result = pre + result;
+    }
+    if (suf.trim() && !result.endsWith(suf.trim())) {
+      result = result + ' ' + suf.trim();
+    }
+    return result;
   },
 
   initPersonality() {
@@ -1022,7 +1113,7 @@ const AICompanion = {
     const moods=MoodSystem.get();
     const latest=moodOverride || moods[0]?.mood;
     if(!latest) return;
-    const map={ Happy:{face:'🥰',glow:'rgba(245,158,11,0.25)',lbl:'Sharing your joy!'}, Calm:{face:'😌',glow:'rgba(14,165,233,0.25)',lbl:'At peace with you'}, Neutral:{face:'🤖',glow:'rgba(148,163,184,0.20)',lbl:'Ready to listen'}, Stressed:{face:'😟',glow:'rgba(129,140,248,0.22)',lbl:'Here to help you calm down'}, Sad:{face:'🥺',glow:'rgba(99,102,241,0.22)',lbl:'Sending you a hug 💙'} };
+    const map={ Happy:{face:'🥰',glow:'rgba(56,189,248,0.25)',lbl:'Sharing your joy!'}, Calm:{face:'😌',glow:'rgba(14,165,233,0.25)',lbl:'At peace with you'}, Neutral:{face:'🤖',glow:'rgba(148,163,184,0.20)',lbl:'Ready to listen'}, Stressed:{face:'😟',glow:'rgba(129,140,248,0.22)',lbl:'Here to help you calm down'}, Sad:{face:'🥺',glow:'rgba(99,102,241,0.22)',lbl:'Sending you a hug 💙'} };
     const r=map[latest]||map.Neutral;
     const face=_$('avatar-face'), glow=_$('avatar-glow'), lbl=_$('avatar-mood-txt');
     if(face) face.textContent=r.face;
@@ -1082,37 +1173,38 @@ const AICompanion = {
 
   generateResponse(text) {
     const intent=this.detectIntent(text);
-    let base=_rand(this.RESPONSES[intent]||this.RESPONSES.default);
-    /* Context-aware add-on */
-    const moods=MoodSystem.get();
-    if(moods.length && intent==='default'){
-      const last=moods[0];
-      if(last.mood==='Sad'||last.mood==='Stressed')
-        base += ` I noticed your recent mood was ${last.mood.toLowerCase()}. Would you like to explore that more?`;
-    }
+    const base=_rand(this.RESPONSES[intent]||this.RESPONSES.default);
     return intent!=='crisis' ? this.applyPersonality(base) : base;
   },
 
   /* ── Chat persistence ─────────────────────────────────── */
-  getHistory() { return Storage.readUser(KEYS.CHAT,_currentUser.username,[]); },
-  saveHistory(h){ return Storage.writeUser(KEYS.CHAT,_currentUser.username,h.slice(-80)); },
+  getHistory() { return Storage.readUser(KEYS.CHAT,_currentUser?.username,[]); },
+  saveHistory(h){ return Storage.writeUser(KEYS.CHAT,_currentUser?.username,h.slice(-80)); },
+
+  _isGenerating: false,
 
   cancelPending() {
     _chatReplyTimers.forEach(timer=>clearTimeout(timer));
     _chatReplyTimers.clear();
-    _qsa('.typing-pending').forEach(typing=>typing.remove());
+    this._removeTyping();
+    this._isGenerating = false;
+    const sendBtn = document.querySelector('.chat-send-btn');
+    if (sendBtn) sendBtn.disabled = false;
   },
 
   /* ── Chat render ──────────────────────────────────────── */
   init() {
     const container=_$('chat-messages');
+    if (!container) return;
+    this.cancelPending();
+    container.innerHTML='';
     const history=this.getHistory();
     if(!history.length){
-      const welcome={ role:'bot', text:`Hello ${_currentUser.name.split(' ')[0]}! 👋 I'm WALL·E, your personal AI mental wellness companion. I'm here to listen, support, and guide you. How are you feeling today?`, time:new Date().toISOString() };
+      const first = _currentUser?.name ? _currentUser.name.split(' ')[0] : 'friend';
+      const welcome={ role:'bot', text:`Hello ${first}! 👋 I'm WALL·E, your personal AI mental wellness companion. I'm here to listen, support, and guide you. How are you feeling today?`, time:new Date().toISOString() };
       this.saveHistory([welcome]);
       this._renderMsg(welcome, container);
     } else {
-      container.innerHTML='';
       history.forEach(msg=>this._renderMsg(msg, container));
       container.scrollTop=container.scrollHeight;
     }
@@ -1123,37 +1215,59 @@ const AICompanion = {
   },
 
   _renderMsg(msg, container) {
+    if (!container) return;
     const isUser=msg.role==='user';
     const time=new Date(msg.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
     const div=document.createElement('div');
     div.className=`chat-msg ${isUser?'user':'bot'}`;
-    div.innerHTML='<div class="chat-msg-avatar"></div><div><div class="chat-bubble"></div><div class="chat-msg-time"></div></div>';
-    div.querySelector('.chat-msg-avatar').textContent=isUser?_currentUser.name[0].toUpperCase():'🤖';
+    div.innerHTML='<div class="chat-msg-avatar"></div><div class="chat-msg-content"><div class="chat-bubble"></div><div class="chat-msg-time"></div></div>';
+    div.querySelector('.chat-msg-avatar').textContent=isUser?(_currentUser?.name ? _currentUser.name[0].toUpperCase() : 'U'):'🤖';
     div.querySelector('.chat-bubble').textContent=String(msg.text??'');
     div.querySelector('.chat-msg-time').textContent=time;
     container.appendChild(div);
     container.scrollTop=container.scrollHeight;
   },
 
+  _removeTyping(container) {
+    const target = container || _$('chat-messages');
+    if (!target) return;
+    target.querySelectorAll('.typing-pending').forEach(el => el.remove());
+  },
+
   _showTyping(container) {
+    this._removeTyping(container);
     const el=document.createElement('div');
     el.className='chat-msg bot typing-pending';
-    el.innerHTML=`<div class="chat-msg-avatar">🤖</div><div class="chat-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
-    container.appendChild(el); container.scrollTop=container.scrollHeight;
+    el.innerHTML='<div class="chat-msg-avatar">🤖</div><div class="chat-msg-content"><div class="chat-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>';
+    container.appendChild(el);
+    container.scrollTop=container.scrollHeight;
     return el;
   },
 
   send() {
+    if (this._isGenerating) return;
     const input=_$('chat-input'), container=_$('chat-messages');
-    const text=input.value.trim(); if(!text) return;
+    if (!input || !container) return;
+    const text=input.value.trim();
+    if(!text) return;
+
+    this._isGenerating = true;
+    const sendBtn = document.querySelector('.chat-send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+
     const userMsg={ role:'user', text, time:new Date().toISOString() };
     this._renderMsg(userMsg, container);
     const h=this.getHistory(); h.push(userMsg); this.saveHistory(h);
+
     input.value='';
+    input.style.height = 'auto';
+
     const typing=this._showTyping(container);
     const replyTimer=setTimeout(()=>{
       _chatReplyTimers.delete(replyTimer);
-      typing.remove();
+      this._removeTyping(container);
+      this._isGenerating = false;
+      if (sendBtn) sendBtn.disabled = false;
       if(!_currentUser) return;
       const botMsg={ role:'bot', text:this.generateResponse(text), time:new Date().toISOString() };
       this._renderMsg(botMsg, container);
@@ -1163,13 +1277,29 @@ const AICompanion = {
     _chatReplyTimers.add(replyTimer);
   },
 
-  handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); this.send(); } },
+  handleKey(e) {
+    if(e.key==='Enter'&&!e.shiftKey){
+      e.preventDefault();
+      this.send();
+    }
+  },
+
+  quickPrompt(text) {
+    if (this._isGenerating) return;
+    const input = _$('chat-input');
+    if (!input) return;
+    input.value = text;
+    this.send();
+  },
 
   clearChat() {
     if(!confirm('Clear all chat history?')) return;
     this.cancelPending();
     const a=Storage.readJSON(KEYS.CHAT,{});
-    if(a&&typeof a==='object'&&!Array.isArray(a)) { delete a[_currentUser.username]; Storage.writeJSON(KEYS.CHAT,a); }
+    if(a&&typeof a==='object'&&!Array.isArray(a) && _currentUser) {
+      delete a[_currentUser.username];
+      Storage.writeJSON(KEYS.CHAT,a);
+    }
     this.init();
   },
 };
@@ -1213,6 +1343,16 @@ const JournalSystem = {
     _$('journal-form-title').textContent='New Entry';
     _$('journal-cancel-btn').style.display='none';
     _editJournalId=null;
+  },
+
+  insertTag(tag) {
+    const bodyEl = _$('journal-body');
+    if (!bodyEl) return;
+    const tagText = `#${tag}`;
+    if (!bodyEl.value.includes(tagText)) {
+      bodyEl.value = bodyEl.value.trim() ? `${bodyEl.value.trim()}\n\n${tagText} ` : `${tagText} `;
+    }
+    bodyEl.focus();
   },
 
   edit(id) {
@@ -2306,6 +2446,11 @@ const MentalWeatherSystem = {
     if (moodFactor) moodFactor.innerHTML = `Mood: <strong>${data.mood}</strong>`;
     if (energyFactor) energyFactor.innerHTML = `Energy: <strong>${data.energy}</strong>`;
     if (stressFactor) stressFactor.innerHTML = `Tension: <strong>${data.tension}</strong>`;
+
+    /* Sanctuary Floating Weather Card */
+    _setText('sanctuary-weather-art', data.icon);
+    _setText('sanctuary-weather-title', data.title);
+    _setText('sanctuary-weather-sub', data.summary);
   }
 };
 

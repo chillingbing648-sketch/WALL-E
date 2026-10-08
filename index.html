@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WALL·E — Premium AI Mental Wellness</title>
+  <title>WALL·E — Your Mental Wellness Companion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
@@ -23,59 +23,101 @@
   <div class="orb orb-4"></div>
 
   <!-- ══════════════════════════════════════════
-       AUTH SCREEN
+       AUTH / BRAND LANDING SCREEN
   ══════════════════════════════════════════ -->
   <div id="auth-screen" class="auth-screen">
     <div class="auth-ambient-orb auth-ambient-1"></div>
     <div class="auth-ambient-orb auth-ambient-2"></div>
 
-    <div class="auth-card glass-panel">
-      <div class="auth-logo">
-        <div class="auth-robot-wrap">
-          <div class="auth-robot-ring"></div>
-          <span class="auth-robot-emoji">🤖</span>
+    <div class="auth-container">
+      <!-- Left: Art-Directed Brand Manifesto -->
+      <div class="auth-brand-hero">
+        <div class="auth-brand-logo-row">
+          <span class="auth-brand-sprout" aria-hidden="true">🌱</span>
+          <span class="auth-brand-name">WALL·E</span>
         </div>
-        <h1 class="auth-brand">WALL·E</h1>
-        <p class="auth-tagline">Elevated Mental Wellness</p>
+        <p class="auth-brand-tagline">Your Mental Wellness Companion</p>
+        <h1 class="auth-hero-statement">A calmer mind.<br/>A kinder you.</h1>
+        <p class="auth-hero-description">
+          WALL·E is your safe space to pause, reflect, and grow. Track your mood, build healthy habits, and find peace in the little things.
+        </p>
+        <div class="auth-hero-action-row">
+          <button class="btn-primary btn-journey" onclick="AppController.startJourney()">
+            Start Your Journey →
+          </button>
+        </div>
+        <div class="auth-trust-badge">
+          <span class="auth-trust-icon">🛡️</span>
+          <span>No data leaves your device · Pure local privacy</span>
+        </div>
       </div>
 
-      <!-- Login Form -->
-      <div id="login-form" class="auth-form active">
-        <h2 class="auth-form-title">Welcome back</h2>
-        <p class="auth-form-sub">Your sanctuary awaits.</p>
-        <div class="field-group">
-          <label class="field-label">Username</label>
-          <input class="field-input" type="text" id="login-username" placeholder="Enter your username" autocomplete="off" />
-        </div>
-        <div class="field-group">
-          <label class="field-label">Password</label>
-          <input class="field-input" type="password" id="login-password" placeholder="Enter your password" />
-        </div>
-        <p id="login-error" class="form-error"></p>
-        <button class="btn-primary btn-full" onclick="AppController.login()">Sign In</button>
-        <p class="auth-hint">Demo: <strong>demo</strong> / <strong>demo1234</strong></p>
-        <p class="auth-switch">Don't have an account? <a onclick="AppController.toggleAuth()">Sign Up</a></p>
-      </div>
+      <!-- Right: Authentication Card -->
+      <div class="auth-card-panel">
+        <div class="auth-card glass-panel">
+          <!-- Mini WALL-E Sunset Mascot -->
+          <div class="auth-mascot-row">
+            <div class="auth-mascot-visual">
+              <svg viewBox="0 0 100 80" class="auth-mascot-svg" aria-hidden="true">
+                <circle cx="50" cy="40" r="32" fill="radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%)"/>
+                <!-- Binocular Eyes -->
+                <ellipse cx="36" cy="36" rx="14" ry="11" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5"/>
+                <ellipse cx="36" cy="36" rx="9" ry="7" fill="#F59E0B" opacity="0.9"/>
+                <circle cx="34" cy="34" r="2" fill="#FFFFFF"/>
+                <ellipse cx="64" cy="36" rx="14" ry="11" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5"/>
+                <ellipse cx="64" cy="36" rx="9" ry="7" fill="#F59E0B" opacity="0.9"/>
+                <circle cx="62" cy="34" r="2" fill="#FFFFFF"/>
+                <rect x="46" y="33" width="8" height="6" fill="#334155" rx="1"/>
+                <!-- Plant Sprout beside him -->
+                <path d="M 82 50 Q 86 38 90 32" stroke="#10B981" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <path d="M 90 34 Q 96 30 98 27 Q 94 34 89 35 Z" fill="#10B981"/>
+              </svg>
+            </div>
+            <div class="auth-mascot-text">
+              <h2 class="auth-card-heading">Welcome Back!</h2>
+              <p class="auth-card-sub">Sign in to continue your journey.</p>
+            </div>
+          </div>
 
-      <!-- Sign-Up Form -->
-      <div id="signup-form" class="auth-form">
-        <h2 class="auth-form-title">Create account</h2>
-        <p class="auth-form-sub">Begin your path to wellness today.</p>
-        <div class="field-group">
-          <label class="field-label">Full Name</label>
-          <input class="field-input" type="text" id="signup-name" placeholder="Your full name" autocomplete="off" />
+          <!-- Login Form -->
+          <div id="login-form" class="auth-form active">
+            <div class="field-group">
+              <label class="field-label" for="login-username">Username</label>
+              <input class="field-input" type="text" id="login-username" placeholder="e.g. demo" autocomplete="off" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="login-password">Password</label>
+              <input class="field-input" type="password" id="login-password" placeholder="••••••••" />
+            </div>
+            <p id="login-error" class="form-error"></p>
+            <button class="btn-primary btn-full" onclick="AppController.login()">Sign In →</button>
+            <div class="auth-footer-links">
+              <p class="auth-hint">Demo account: <strong>demo</strong> / <strong>demo1234</strong></p>
+              <p class="auth-switch">Don't have an account? <a onclick="AppController.toggleAuth()">Create Account</a></p>
+            </div>
+          </div>
+
+          <!-- Sign-Up Form -->
+          <div id="signup-form" class="auth-form">
+            <div class="field-group">
+              <label class="field-label" for="signup-name">Full Name</label>
+              <input class="field-input" type="text" id="signup-name" placeholder="Your full name" autocomplete="off" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="signup-username">Username</label>
+              <input class="field-input" type="text" id="signup-username" placeholder="Choose a username" autocomplete="off" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="signup-password">Password</label>
+              <input class="field-input" type="password" id="signup-password" placeholder="Minimum 4 characters" />
+            </div>
+            <p id="signup-error" class="form-error"></p>
+            <button class="btn-primary btn-full" onclick="AppController.signup()">Get Started →</button>
+            <div class="auth-footer-links">
+              <p class="auth-switch">Already have an account? <a onclick="AppController.toggleAuth()">Sign In</a></p>
+            </div>
+          </div>
         </div>
-        <div class="field-group">
-          <label class="field-label">Username</label>
-          <input class="field-input" type="text" id="signup-username" placeholder="Choose a username" autocomplete="off" />
-        </div>
-        <div class="field-group">
-          <label class="field-label">Password</label>
-          <input class="field-input" type="password" id="signup-password" placeholder="Create a password (min 4 chars)" />
-        </div>
-        <p id="signup-error" class="form-error"></p>
-        <button class="btn-primary btn-full" onclick="AppController.signup()">Get Started</button>
-        <p class="auth-switch">Already have an account? <a onclick="AppController.toggleAuth()">Sign In</a></p>
       </div>
     </div>
   </div>
@@ -88,22 +130,25 @@
     <!-- ── Sidebar ── -->
     <aside id="sidebar" class="sidebar glass-panel">
       <div class="sidebar-logo">
-        <span class="sidebar-logo-icon">🤖</span>
-        <span class="sidebar-logo-text">WALL·E</span>
-        <button class="sidebar-close-btn" onclick="AppController.toggleSidebar()">✕</button>
+        <span class="sidebar-logo-icon">🌱</span>
+        <div class="sidebar-logo-titles">
+          <span class="sidebar-logo-text">WALL·E</span>
+          <span class="sidebar-logo-sub">Mental Wellness</span>
+        </div>
+        <button class="sidebar-close-btn" onclick="AppController.toggleSidebar()" aria-label="Close sidebar">✕</button>
       </div>
 
       <div class="sidebar-profile">
         <div class="profile-avatar" id="user-avatar">U</div>
         <div class="profile-info">
           <p class="profile-name" id="sidebar-username">User</p>
-          <span class="profile-badge">✦ Active</span>
+          <span class="profile-badge">✦ Active Safe Space</span>
         </div>
       </div>
 
       <div class="sidebar-score-block">
         <div class="ssb-header">
-          <span class="ssb-label">Wellness Score</span>
+          <span class="ssb-label">Harmony Balance</span>
           <span class="ssb-value" id="sidebar-ws-val">—</span>
         </div>
         <div class="ssb-bar-track">
@@ -114,16 +159,12 @@
 
       <nav class="sidebar-nav">
         <a href="#section-dashboard" class="nav-link active" data-section="dashboard" onclick="event.preventDefault(); AppController.navigate('dashboard')">
-          <span class="nav-link-icon">⬡</span>
-          <span class="nav-link-text">Dashboard</span>
+          <span class="nav-link-icon">🏠</span>
+          <span class="nav-link-text">Home</span>
         </a>
         <a href="#section-mood" class="nav-link" data-section="mood" onclick="event.preventDefault(); AppController.navigate('mood')">
           <span class="nav-link-icon">◉</span>
           <span class="nav-link-text">Mood Tracker</span>
-        </a>
-        <a href="#section-chat" class="nav-link" data-section="chat" onclick="event.preventDefault(); AppController.navigate('chat')">
-          <span class="nav-link-icon">◎</span>
-          <span class="nav-link-text">AI Companion</span>
         </a>
         <a href="#section-journal" class="nav-link" data-section="journal" onclick="event.preventDefault(); AppController.navigate('journal')">
           <span class="nav-link-icon">◐</span>
@@ -142,6 +183,22 @@
           <span class="nav-link-icon">🌱</span>
           <span class="nav-link-text">Memory Garden</span>
         </a>
+        <a href="#dashboard-weather-card" class="nav-link" data-section="weather" onclick="event.preventDefault(); AppController.navigate('dashboard'); setTimeout(() => { const el=document.getElementById('dashboard-weather-card'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 100);">
+          <span class="nav-link-icon">☁</span>
+          <span class="nav-link-text">Mental Weather</span>
+        </a>
+        <a href="#dashboard-constellation-card" class="nav-link" data-section="constellation" onclick="event.preventDefault(); AppController.navigate('dashboard'); setTimeout(() => { const el=document.getElementById('dashboard-constellation-card'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 100);">
+          <span class="nav-link-icon">✨</span>
+          <span class="nav-link-text">Tiny Wins</span>
+        </a>
+        <a href="#section-chat" class="nav-link" data-section="chat" onclick="event.preventDefault(); AppController.navigate('chat')">
+          <span class="nav-link-icon">◎</span>
+          <span class="nav-link-text">AI Companion</span>
+        </a>
+        <a href="#section-sounds" class="nav-link" data-section="sounds" onclick="event.preventDefault(); AppController.navigate('sounds')">
+          <span class="nav-link-icon">≋</span>
+          <span class="nav-link-text">Zen Station</span>
+        </a>
         <a href="#section-recommendations" class="nav-link" data-section="recommendations" onclick="event.preventDefault(); AppController.navigate('recommendations')">
           <span class="nav-link-icon">◒</span>
           <span class="nav-link-text">Insights</span>
@@ -149,10 +206,6 @@
         <a href="#section-report" class="nav-link" data-section="report" onclick="event.preventDefault(); AppController.navigate('report')">
           <span class="nav-link-icon">◓</span>
           <span class="nav-link-text">Report</span>
-        </a>
-        <a href="#section-sounds" class="nav-link" data-section="sounds" onclick="event.preventDefault(); AppController.navigate('sounds')">
-          <span class="nav-link-icon">≋</span>
-          <span class="nav-link-text">Zen Station</span>
         </a>
       </nav>
 
@@ -167,15 +220,28 @@
     <!-- ── Main Content ── -->
     <main class="main-wrap">
 
+      <!-- ── Art-Directed Topbar ── -->
       <header class="topbar glass-panel">
-        <button class="topbar-menu" onclick="AppController.toggleSidebar()">☰</button>
-        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
+        <div class="topbar-left">
+          <button class="topbar-menu" onclick="AppController.toggleSidebar()" aria-label="Toggle navigation menu">☰</button>
+          <div class="topbar-greeting-wrap">
+            <h1 class="topbar-title" id="topbar-title">
+              <span class="topbar-sun-icon" aria-hidden="true">☼</span>
+              <span id="topbar-greeting-text">Good morning, Alex!</span>
+            </h1>
+            <p class="topbar-subtext" id="topbar-subtext">Take a deep breath. You're doing great.</p>
+          </div>
+        </div>
+
         <div class="topbar-actions">
+          <span class="topbar-date" id="topbar-date">Tue, 22 Apr</span>
+          <button class="topbar-zen-btn" onclick="WallEMomentSystem.openPicker()" title="Take a quiet moment with WALL·E">
+            <span>✦</span>
+          </button>
           <div class="ws-pill" onclick="AppController.navigate('dashboard')" title="Wellness Score">
             <span class="ws-pill-icon">⬡</span>
             <span id="ws-topbar-val">—</span>
           </div>
-          <span class="topbar-date" id="topbar-date"></span>
           <div class="topbar-avatar" id="topbar-avatar">U</div>
         </div>
       </header>
@@ -184,129 +250,335 @@
            DASHBOARD (PERSONAL WELLNESS HOME)
       ══════════════════════════════════ -->
       <section id="section-dashboard" class="page-section active">
-        <!-- 1. Emotional Anchor: WALL·E Companion Sanctuary Hero -->
+
+        <!-- 1. Emotional Visual Anchor: Panoramic WALL·E Sanctuary Hero -->
         <div class="dashboard-sanctuary-hero motion-reveal">
-          <div class="sanctuary-character-col">
-            <div class="sanctuary-avatar-stage">
-              <div class="sanctuary-aura" id="sanctuary-aura"></div>
-              <div class="sanctuary-walle" id="sanctuary-walle">🤖</div>
-              <div class="sanctuary-lamp" aria-hidden="true"></div>
+          <!-- Ambient Sky & Lighting Elements -->
+          <div class="sanctuary-twilight-sky" aria-hidden="true">
+            <div class="sanctuary-stars-cluster"></div>
+            <div class="sanctuary-horizon-glow"></div>
+          </div>
+
+          <!-- Floating Satellite Panel (Left): Today's Mood -->
+          <div class="sanctuary-floating-card sanctuary-floating-left glass-panel" id="sanctuary-mood-card">
+            <span class="sfc-label">Today's Mood</span>
+            <div class="sfc-mood-meter">
+              <div class="sfc-mood-aura" id="sanctuary-aura"></div>
+              <span class="sfc-mood-emoji" id="sanctuary-mood-emoji">😌</span>
+            </div>
+            <h4 class="sfc-mood-title" id="sanctuary-mood-title">Calm</h4>
+            <p class="sfc-mood-sub" id="sanctuary-mood-energy">Energy: Steady</p>
+            <button class="btn-primary btn-sm sfc-btn" onclick="AppController.navigate('mood')">
+              Track Mood →
+            </button>
+          </div>
+
+          <!-- Central Character Stage: Master Vector SVG of WALL-E & Boot Plant -->
+          <div class="sanctuary-character-stage">
+            <div class="sanctuary-walle" id="sanctuary-walle">
+              <svg class="sanctuary-walle-art" viewBox="0 0 380 340" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WALL-E beside his green seedling in a boot watching the sunset">
+                <defs>
+                  <linearGradient id="w-sky-haze" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="rgba(245, 158, 11, 0.32)"/>
+                    <stop offset="50%" stop-color="rgba(217, 119, 6, 0.12)"/>
+                    <stop offset="100%" stop-color="transparent"/>
+                  </linearGradient>
+                  <radialGradient id="w-sun-glow" cx="50%" cy="80%" r="60%">
+                    <stop offset="0%" stop-color="rgba(251, 191, 36, 0.35)"/>
+                    <stop offset="45%" stop-color="rgba(245, 158, 11, 0.16)"/>
+                    <stop offset="100%" stop-color="transparent"/>
+                  </radialGradient>
+                  <linearGradient id="w-yellow-body" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#FBBF24"/>
+                    <stop offset="25%" stop-color="#E5A93C"/>
+                    <stop offset="70%" stop-color="#D97706"/>
+                    <stop offset="100%" stop-color="#92400E"/>
+                  </linearGradient>
+                  <linearGradient id="w-yellow-highlight" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#FDE68A"/>
+                    <stop offset="100%" stop-color="#D97706"/>
+                  </linearGradient>
+                  <linearGradient id="w-dark-metal" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#475569"/>
+                    <stop offset="50%" stop-color="#334155"/>
+                    <stop offset="100%" stop-color="#1E293B"/>
+                  </linearGradient>
+                  <linearGradient id="w-tread-body" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#1E293B"/>
+                    <stop offset="50%" stop-color="#0F172A"/>
+                    <stop offset="100%" stop-color="#020617"/>
+                  </linearGradient>
+                  <radialGradient id="w-lens-core" cx="45%" cy="45%" r="55%">
+                    <stop offset="0%" stop-color="#FEF08A"/>
+                    <stop offset="35%" stop-color="#F59E0B"/>
+                    <stop offset="75%" stop-color="#B45309"/>
+                    <stop offset="100%" stop-color="#451A03"/>
+                  </radialGradient>
+                  <radialGradient id="w-lens-glass" cx="30%" cy="30%" r="65%">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.75)"/>
+                    <stop offset="30%" stop-color="rgba(255,255,255,0.15)"/>
+                    <stop offset="70%" stop-color="transparent"/>
+                    <stop offset="100%" stop-color="rgba(15, 23, 42, 0.85)"/>
+                  </radialGradient>
+                  <linearGradient id="w-boot-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#6B3410"/>
+                    <stop offset="45%" stop-color="#451A03"/>
+                    <stop offset="100%" stop-color="#1E0A00"/>
+                  </linearGradient>
+                  <linearGradient id="w-leaf-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#059669"/>
+                    <stop offset="60%" stop-color="#10B981"/>
+                    <stop offset="100%" stop-color="#6EE7B7"/>
+                  </linearGradient>
+                  <filter id="w-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3.5" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                  </filter>
+                  <filter id="w-soft-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="6"/>
+                  </filter>
+                </defs>
+
+                <!-- Horizon Atmosphere Aura Behind WALL-E -->
+                <rect x="0" y="150" width="380" height="190" fill="url(#w-sky-haze)"/>
+                <ellipse cx="190" cy="265" rx="160" ry="80" fill="url(#w-sun-glow)"/>
+
+                <!-- Rocky Outcrop Ground -->
+                <path d="M 0 318 Q 80 304 180 308 Q 280 312 380 298 L 380 340 L 0 340 Z" fill="#0B1120"/>
+                <path d="M 15 320 Q 95 310 185 313 Q 290 316 365 304" stroke="#1E293B" stroke-width="2" fill="none"/>
+                
+                <!-- Ground Shadows -->
+                <ellipse cx="175" cy="316" rx="115" ry="14" fill="#030712" opacity="0.75" filter="url(#w-soft-shadow)"/>
+                <ellipse cx="300" cy="318" rx="35" ry="9" fill="#030712" opacity="0.65" filter="url(#w-soft-shadow)"/>
+
+                <!-- WALL-E CHARACTER GROUP -->
+                <g class="walle-anim-character" id="walle-character-group">
+                  <!-- Left Tread -->
+                  <g class="walle-tread-left">
+                    <path d="M 82 238 L 126 238 Q 138 275 132 308 L 76 308 Q 70 275 82 238 Z" fill="url(#w-tread-body)" stroke="#334155" stroke-width="1.5"/>
+                    <circle cx="92" cy="292" r="12" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+                    <circle cx="92" cy="292" r="4" fill="#64748B"/>
+                    <circle cx="118" cy="292" r="12" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+                    <circle cx="118" cy="292" r="4" fill="#64748B"/>
+                    <circle cx="104" cy="254" r="9" fill="#1E293B" stroke="#475569" stroke-width="1.2"/>
+                    <circle cx="104" cy="254" r="3" fill="#64748B"/>
+                    <path d="M 73 308 L 135 308 M 80 236 L 128 236" stroke="#475569" stroke-width="2" stroke-dasharray="3,3"/>
+                  </g>
+
+                  <!-- Right Tread -->
+                  <g class="walle-tread-right">
+                    <path d="M 224 238 L 268 238 Q 280 275 274 308 L 218 308 Q 212 275 224 238 Z" fill="url(#w-tread-body)" stroke="#334155" stroke-width="1.5"/>
+                    <circle cx="234" cy="292" r="12" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+                    <circle cx="234" cy="292" r="4" fill="#64748B"/>
+                    <circle cx="260" cy="292" r="12" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+                    <circle cx="260" cy="292" r="4" fill="#64748B"/>
+                    <circle cx="246" cy="254" r="9" fill="#1E293B" stroke="#475569" stroke-width="1.2"/>
+                    <circle cx="246" cy="254" r="3" fill="#64748B"/>
+                    <path d="M 215 308 L 277 308 M 222 236 L 270 236" stroke="#475569" stroke-width="2" stroke-dasharray="3,3"/>
+                  </g>
+
+                  <!-- Cubical Torso Chassis -->
+                  <g class="walle-torso">
+                    <rect x="116" y="196" width="118" height="102" rx="7" fill="url(#w-yellow-body)" stroke="#78350F" stroke-width="2"/>
+                    <path d="M 120 198 L 230 198 L 226 204 L 124 204 Z" fill="url(#w-yellow-highlight)" opacity="0.85"/>
+                    <path d="M 122 248 L 228 248" stroke="#78350F" stroke-width="2"/>
+                    <path d="M 175 248 L 175 294" stroke="#78350F" stroke-width="1.5"/>
+                    <circle cx="123" cy="204" r="1.8" fill="#451A03"/>
+                    <circle cx="227" cy="204" r="1.8" fill="#451A03"/>
+                    <circle cx="123" cy="242" r="1.8" fill="#451A03"/>
+                    <circle cx="227" cy="242" r="1.8" fill="#451A03"/>
+                    <circle cx="123" cy="290" r="1.8" fill="#451A03"/>
+                    <circle cx="227" cy="290" r="1.8" fill="#451A03"/>
+
+                    <!-- Solar Charge Gauge -->
+                    <g class="walle-solar-gauge">
+                      <rect x="128" y="212" width="48" height="13" rx="2.5" fill="#0B0F1A" stroke="#334155" stroke-width="1"/>
+                      <rect x="131" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
+                      <rect x="140" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
+                      <rect x="149" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
+                      <rect x="158" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
+                      <rect x="167" y="214.5" width="7" height="8" rx="1" fill="#451A03"/>
+                      <text x="129" y="233" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="6.5" font-weight="700" fill="#94A3B8" letter-spacing="0.5">SOLAR</text>
+                    </g>
+
+                    <!-- WALL-E Badge -->
+                    <g class="walle-brand-badge">
+                      <circle cx="206" cy="220" r="9" fill="#DC2626" stroke="#991B1B" stroke-width="1"/>
+                      <circle cx="206" cy="220" r="7" fill="none" stroke="#FEF2F2" stroke-width="0.8" opacity="0.6"/>
+                      <rect x="190" y="231" width="32" height="8" rx="2" fill="#0F172A" stroke="#334155" stroke-width="0.8"/>
+                      <text x="206" y="237.5" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="6" font-weight="800" fill="#F8FAFC" text-anchor="middle" letter-spacing="0.8">WALL·E</text>
+                    </g>
+
+                    <rect x="163" y="252" width="24" height="6" rx="2" fill="#334155" stroke="#1E293B" stroke-width="1"/>
+                    <circle cx="170" cy="255" r="1.5" fill="#94A3B8"/>
+                    <circle cx="180" cy="255" r="1.5" fill="#94A3B8"/>
+                  </g>
+
+                  <!-- Arms -->
+                  <g class="walle-arms">
+                    <path d="M 116 230 L 98 250 L 108 266" stroke="url(#w-dark-metal)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M 104 266 L 98 274 M 108 266 L 108 276 M 112 266 L 118 274" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M 234 230 L 254 246 L 268 260" stroke="url(#w-dark-metal)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M 266 258 L 274 263 M 268 260 L 274 269 M 264 262 L 268 271" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+                  </g>
+
+                  <!-- Neck Support Bracket -->
+                  <g class="walle-neck">
+                    <rect x="168" y="166" width="14" height="32" rx="3" fill="url(#w-dark-metal)" stroke="#1E293B" stroke-width="1.5"/>
+                    <line x1="164" y1="172" x2="164" y2="194" stroke="#64748B" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="186" y1="172" x2="186" y2="194" stroke="#64748B" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="175" cy="164" r="8" fill="#475569" stroke="#1E293B" stroke-width="1.5"/>
+                    <circle cx="175" cy="164" r="3" fill="#94A3B8"/>
+                  </g>
+
+                  <!-- Expressive Binocular Head -->
+                  <g class="walle-anim-head" id="walle-head-assembly" transform="rotate(-2.5 175 125)">
+                    <rect x="164" y="118" width="22" height="12" rx="2" fill="url(#w-dark-metal)" stroke="#1E293B" stroke-width="1.2"/>
+                    <circle cx="175" cy="124" r="2.5" fill="#94A3B8"/>
+
+                    <!-- Left Eye Binocular -->
+                    <g class="walle-left-eye" transform="rotate(-3 138 122)">
+                      <path d="M 106 100 Q 140 92 168 98 L 165 142 Q 138 148 106 142 Z" fill="url(#w-yellow-body)" stroke="#78350F" stroke-width="1.8"/>
+                      <path d="M 108 102 Q 138 95 166 100" stroke="#FDE68A" stroke-width="2.5" fill="none" opacity="0.8"/>
+                      <ellipse cx="137" cy="123" rx="24" ry="18" fill="#0F172A" stroke="#475569" stroke-width="2"/>
+                      <ellipse cx="137" cy="123" rx="19" ry="14" fill="url(#w-lens-core)"/>
+                      <ellipse cx="137" cy="123" rx="14" ry="10" fill="none" stroke="rgba(251, 191, 36, 0.4)" stroke-width="1"/>
+                      <ellipse cx="137" cy="123" rx="8" ry="6" fill="#1E0A00" opacity="0.65"/>
+                      <ellipse cx="137" cy="123" rx="19" ry="14" fill="url(#w-lens-glass)"/>
+                      <circle cx="130" cy="116" r="3.5" fill="#FFFFFF" opacity="0.95"/>
+                      <circle cx="135" cy="120" r="1.5" fill="#FFFFFF" opacity="0.7"/>
+                      <rect x="99" y="115" width="7" height="16" rx="2" fill="#334155" stroke="#1E293B" stroke-width="1"/>
+                    </g>
+
+                    <!-- Right Eye Binocular -->
+                    <g class="walle-right-eye" transform="rotate(3 212 122)">
+                      <path d="M 182 98 Q 210 92 244 100 L 244 142 Q 212 148 185 142 Z" fill="url(#w-yellow-body)" stroke="#78350F" stroke-width="1.8"/>
+                      <path d="M 184 100 Q 212 95 242 102" stroke="#FDE68A" stroke-width="2.5" fill="none" opacity="0.8"/>
+                      <ellipse cx="213" cy="123" rx="24" ry="18" fill="#0F172A" stroke="#475569" stroke-width="2"/>
+                      <ellipse cx="213" cy="123" rx="19" ry="14" fill="url(#w-lens-core)"/>
+                      <ellipse cx="213" cy="123" rx="14" ry="10" fill="none" stroke="rgba(251, 191, 36, 0.4)" stroke-width="1"/>
+                      <ellipse cx="213" cy="123" rx="8" ry="6" fill="#1E0A00" opacity="0.65"/>
+                      <ellipse cx="213" cy="123" rx="19" ry="14" fill="url(#w-lens-glass)"/>
+                      <circle cx="206" cy="116" r="3.5" fill="#FFFFFF" opacity="0.95"/>
+                      <circle cx="211" cy="120" r="1.5" fill="#FFFFFF" opacity="0.7"/>
+                      <rect x="244" y="115" width="7" height="16" rx="2" fill="#334155" stroke="#1E293B" stroke-width="1"/>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- THE OLD BOOT & LIVING SPROUT -->
+                <g class="walle-boot-and-plant" id="boot-plant-group">
+                  <path d="M 285 278 L 298 274 L 306 295 L 328 298 Q 334 306 330 314 L 280 316 Q 275 304 285 278 Z" fill="url(#w-boot-grad)" stroke="#290F03" stroke-width="1.5"/>
+                  <path d="M 278 316 L 332 314 L 331 319 L 278 321 Z" fill="#0F172A"/>
+                  <ellipse cx="292" cy="276" rx="8" ry="4" fill="#1A0A02"/>
+                  <circle cx="295" cy="245" r="24" fill="rgba(16, 185, 129, 0.16)" filter="url(#w-glow)"/>
+                  <path d="M 292 274 Q 290 256 294 242" stroke="url(#w-leaf-grad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <path d="M 292 254 Q 278 248 276 240 Q 284 238 293 250 Z" fill="url(#w-leaf-grad)" stroke="#059669" stroke-width="0.8"/>
+                  <path d="M 292 254 Q 284 246 278 241" stroke="#A7F3D0" stroke-width="0.7" fill="none" opacity="0.8"/>
+                  <path d="M 294 244 Q 308 234 316 230 Q 312 242 295 246 Z" fill="url(#w-leaf-grad)" stroke="#059669" stroke-width="0.8"/>
+                  <path d="M 294 244 Q 306 237 314 232" stroke="#A7F3D0" stroke-width="0.7" fill="none" opacity="0.8"/>
+                  <circle cx="315" cy="231" r="1.5" fill="#FFFFFF" filter="url(#w-glow)"/>
+                </g>
+              </svg>
             </div>
           </div>
-          <div class="sanctuary-welcome-col">
-            <div class="sanctuary-badge-row">
+
+          <!-- Floating Satellite Panel (Right): Mental Weather -->
+          <div class="sanctuary-floating-card sanctuary-floating-right glass-panel" id="sanctuary-weather-card">
+            <span class="sfc-label">Mental Weather</span>
+            <div class="sfc-weather-art" id="sanctuary-weather-art" aria-hidden="true">☁️</div>
+            <h4 class="sfc-weather-title" id="sanctuary-weather-title">Partly Cloudy</h4>
+            <p class="sfc-weather-sub" id="sanctuary-weather-sub">You seem more balanced today.</p>
+            <button class="btn-ghost btn-sm sfc-btn" onclick="document.getElementById('dashboard-weather-card').scrollIntoView({behavior:'smooth'})">
+              View Details →
+            </button>
+          </div>
+
+          <!-- Bottom Quote Bar & Peaceful Presence Controls -->
+          <div class="sanctuary-bottom-bar">
+            <div class="sanctuary-meta-row">
               <span class="sanctuary-status-pill">✦ Space Companion Online</span>
               <span class="sanctuary-date" id="sanctuary-live-date">Today</span>
+              <span class="sanctuary-greeting-tag" id="dashboard-greeting" style="display:none">Welcome home</span>
             </div>
-            <h2 class="sanctuary-title" id="dashboard-greeting">Welcome home, traveler.</h2>
             <p class="sanctuary-thought" id="sanctuary-thought">"Take a slow breath. Your thoughts have a quiet place to land here with me."</p>
             <div class="sanctuary-actions-row">
-              <button class="btn-primary" onclick="WallEMomentSystem.openPicker()">
+              <button class="btn-primary btn-sm" onclick="WallEMomentSystem.openPicker()">
                 <span>✦</span> A Moment with WALL·E
               </button>
-              <button class="btn-ghost" onclick="AppController.navigate('mood')">
+              <button class="btn-ghost btn-sm" onclick="AppController.navigate('mood')">
                 <span>◉</span> Check In Emotion
               </button>
-              <button class="btn-ghost" onclick="MemoryGarden.openAddModal()">
+              <button class="btn-ghost btn-sm" onclick="MemoryGarden.openAddModal()">
                 <span>🌱</span> Plant Win
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 2. Primary Atmospheric State: Mental Weather & Tiny Wins (Balanced Living System) -->
-        <div class="dashboard-atmosphere-grid motion-reveal mt-4">
-          <!-- Mental Weather Showcase -->
-          <div class="card weather-card glass-panel" id="dashboard-weather-card">
-            <div class="weather-card-head">
-              <div>
-                <span class="weather-badge" id="weather-badge">✦ Emotional Climate</span>
-                <h3 class="weather-title" id="weather-title">Calm Clear Sky</h3>
-              </div>
-              <div class="weather-art-wrap" id="weather-art-icon" aria-hidden="true">☀️</div>
-            </div>
-            <div class="weather-sky-stage" id="weather-sky-stage">
-              <div class="weather-ambient-glow" id="weather-glow"></div>
-              <div class="weather-particles" id="weather-particles"></div>
-            </div>
-            <p class="weather-summary" id="weather-summary">Your recent check-ins feel grounded and balanced.</p>
-            <div class="weather-factors" id="weather-factors">
-              <span class="weather-factor-pill" id="wf-mood">Mood: <strong>Calm</strong></span>
-              <span class="weather-factor-pill" id="wf-energy">Energy: <strong>Steady</strong></span>
-              <span class="weather-factor-pill" id="wf-stress">Tension: <strong>Low</strong></span>
-            </div>
+        <!-- 2. Your Wellness at a Glance (Streamlined Horizontal Capsule Grid) -->
+        <div class="glance-section motion-reveal mt-4">
+          <div class="glance-header">
+            <h3 class="glance-title">Your Wellness at a Glance</h3>
+            <span class="glance-sub">Gentle rhythm over pressure</span>
           </div>
 
-          <!-- Tiny Wins Constellation -->
-          <div class="card constellation-card glass-panel" id="dashboard-constellation-card">
-            <div class="constellation-head">
-              <div>
-                <span class="constellation-badge">✦ Care Over Streaks</span>
-                <h3 class="constellation-title">Tiny Wins Constellation</h3>
+          <div class="glance-grid">
+            <!-- 1. Journal Capsule -->
+            <a href="#section-journal" class="glance-capsule glass-panel" onclick="event.preventDefault(); AppController.navigate('journal')">
+              <div class="glance-icon-badge badge-amber">
+                <span>📓</span>
               </div>
-              <span class="constellation-count-pill" id="constellation-count-pill">0 Stars Formed</span>
-            </div>
-            <div class="constellation-canvas-wrap">
-              <svg id="constellation-svg" class="constellation-svg" viewBox="0 0 460 200" preserveAspectRatio="xMidYMid meet">
-                <defs>
-                  <linearGradient id="starLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="rgba(245, 158, 11, 0.45)"/>
-                    <stop offset="100%" stop-color="rgba(99, 102, 241, 0.45)"/>
-                  </linearGradient>
-                  <filter id="starGlow">
-                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                </defs>
-                <g id="constellation-lines"></g>
-                <g id="constellation-stars"></g>
-              </svg>
-            </div>
-            <p class="constellation-msg" id="constellation-msg">You cared for yourself today. Each small positive step lights a star in your sky.</p>
-            <div class="constellation-star-detail" id="constellation-star-detail">
-              <span class="star-detail-icon" id="star-detail-icon">✨</span>
-              <span class="star-detail-text" id="star-detail-text">Tap any star to see what moment created it.</span>
-            </div>
-          </div>
-        </div>
+              <div class="glance-body">
+                <span class="glance-name">Journal</span>
+                <span class="glance-val" id="stat-journal-count">0</span>
+                <span class="glance-metric">reflections written</span>
+              </div>
+              <span class="glance-arrow">›</span>
+            </a>
 
-        <!-- 3. Living Pulse & Rhythm (Calm Metrics Row) -->
-        <div class="stats-row motion-reveal mt-4">
-          <a href="#section-mood" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('mood')">
-            <div class="stat-tile-icon">🌤</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Current Emotion</p>
-              <p class="stat-tile-value" id="stat-today-mood">—</p>
+            <!-- 2. Habits Capsule -->
+            <a href="#section-habits" class="glance-capsule glass-panel" onclick="event.preventDefault(); AppController.navigate('habits')">
+              <div class="glance-icon-badge badge-emerald">
+                <span>✓</span>
+              </div>
+              <div class="glance-body">
+                <span class="glance-name">Habits</span>
+                <span class="glance-val" id="stat-habits-today">0/0</span>
+                <span class="glance-metric">completed today</span>
+              </div>
+              <span class="glance-arrow">›</span>
+            </a>
+
+            <!-- 3. Reset Sessions Capsule -->
+            <div class="glance-capsule glass-panel" onclick="WallEMomentSystem.openPicker()" role="button" tabindex="0">
+              <div class="glance-icon-badge badge-bronze">
+                <span>⌛</span>
+              </div>
+              <div class="glance-body">
+                <span class="glance-name">Reset Sessions</span>
+                <span class="glance-val" id="stat-streak">0 days</span>
+                <span class="glance-metric">gentle momentum</span>
+              </div>
+              <span class="glance-arrow">›</span>
             </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
-          <a href="#section-habits" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('habits')">
-            <div class="stat-tile-icon">🔥</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Habit Momentum</p>
-              <p class="stat-tile-value" id="stat-streak">0 days</p>
-            </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
-          <a href="#section-journal" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('journal')">
-            <div class="stat-tile-icon">📓</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Reflections</p>
-              <p class="stat-tile-value" id="stat-journal-count">0</p>
-            </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
-          <a href="#section-garden" class="stat-tile glass-panel" onclick="event.preventDefault(); AppController.navigate('garden')">
-            <div class="stat-tile-icon">🌱</div>
-            <div class="stat-tile-body">
-              <p class="stat-tile-label">Living Garden</p>
-              <p class="stat-tile-value" id="stat-garden-blooms">0 blooms</p>
-            </div>
-            <span class="stat-tile-arrow">›</span>
-          </a>
+
+            <!-- 4. Tiny Wins Capsule -->
+            <a href="#dashboard-constellation-card" class="glance-capsule glass-panel" onclick="event.preventDefault(); document.getElementById('dashboard-constellation-card').scrollIntoView({behavior:'smooth'})">
+              <div class="glance-icon-badge badge-star">
+                <span>★</span>
+              </div>
+              <div class="glance-body">
+                <span class="glance-name">Tiny Wins</span>
+                <span class="glance-val" id="stat-garden-blooms">0 blooms</span>
+                <span class="glance-metric">stars in your sky</span>
+              </div>
+              <span class="glance-arrow">›</span>
+            </a>
+          </div>
+
+          <!-- Hidden bridge element to preserve stat-today-mood updates from script.js without visual disruption -->
+          <span id="stat-today-mood" style="display:none">—</span>
         </div>
 
         <!-- 4. Personal Wellness Progress & Score -->
@@ -399,35 +671,46 @@
       ══════════════════════════════════ -->
       <section id="section-mood" class="page-section">
         <div class="page-header">
-          <h2 class="page-title">Mood Tracker</h2>
-          <p class="page-subtitle">How are you feeling right now?</p>
+          <h2 class="page-title">How are you feeling today?</h2>
+          <p class="page-subtitle">Pick a mood or explore deeper.</p>
         </div>
 
         <div class="card mood-log-card glass-panel">
-          <h3 class="card-title">Log Today's Mood</h3>
-          <p class="mood-prompt">Select the emotion that best describes you:</p>
+          <div class="mood-card-header">
+            <div>
+              <h3 class="card-title">Log Today's Mood</h3>
+              <p class="mood-prompt">Select the emotion that best reflects your current state:</p>
+            </div>
+            <span class="mood-calm-badge">✦ Emotional Safe Space</span>
+          </div>
+
           <div class="mood-grid motion-reveal">
             <button class="mood-tile" data-mood="Happy" aria-pressed="false" data-score="5" onclick="MoodSystem.select(this)">
+              <div class="mood-tile-glow"></div>
               <span class="mood-tile-emoji">😊</span>
               <span class="mood-tile-label">Happy</span>
               <div class="mood-tile-bar" style="background:var(--mood-happy)"></div>
             </button>
             <button class="mood-tile" data-mood="Calm" aria-pressed="false" data-score="4" onclick="MoodSystem.select(this)">
+              <div class="mood-tile-glow"></div>
               <span class="mood-tile-emoji">😌</span>
               <span class="mood-tile-label">Calm</span>
               <div class="mood-tile-bar" style="background:var(--mood-calm)"></div>
             </button>
             <button class="mood-tile" data-mood="Neutral" aria-pressed="false" data-score="3" onclick="MoodSystem.select(this)">
+              <div class="mood-tile-glow"></div>
               <span class="mood-tile-emoji">😐</span>
               <span class="mood-tile-label">Neutral</span>
               <div class="mood-tile-bar" style="background:var(--mood-neutral)"></div>
             </button>
             <button class="mood-tile" data-mood="Stressed" aria-pressed="false" data-score="2" onclick="MoodSystem.select(this)">
+              <div class="mood-tile-glow"></div>
               <span class="mood-tile-emoji">😰</span>
               <span class="mood-tile-label">Stressed</span>
               <div class="mood-tile-bar" style="background:var(--mood-stressed)"></div>
             </button>
             <button class="mood-tile" data-mood="Sad" aria-pressed="false" data-score="1" onclick="MoodSystem.select(this)">
+              <div class="mood-tile-glow"></div>
               <span class="mood-tile-emoji">😢</span>
               <span class="mood-tile-label">Sad</span>
               <div class="mood-tile-bar" style="background:var(--mood-sad)"></div>
@@ -435,7 +718,10 @@
           </div>
           <p id="mood-selection-feedback" class="mood-selection-feedback" aria-live="polite"></p>
           <textarea id="mood-note" class="field-textarea" placeholder="Add a note about how you're feeling… (optional)"></textarea>
-          <button class="btn-primary" onclick="MoodSystem.log()">Save Mood Entry</button>
+          <div class="mood-actions-row">
+            <button class="btn-primary" onclick="MoodSystem.log()">Save Mood Entry →</button>
+            <button class="btn-ghost" onclick="WallEMomentSystem.openPicker()">✦ Need a breath first?</button>
+          </div>
           <p id="mood-saved-msg" class="feedback-msg"></p>
         </div>
 
@@ -454,7 +740,7 @@
       <section id="section-chat" class="page-section">
         <div class="page-header">
           <h2 class="page-title">AI Companion</h2>
-          <p class="page-subtitle">WALL·E adapts to you. Pick a personality mode.</p>
+          <p class="page-subtitle">WALL·E is here beside you. Always gentle, never judgmental.</p>
         </div>
 
         <div class="personality-bar card glass-panel">
@@ -488,13 +774,23 @@
           <div class="chat-avatar-panel">
             <div class="chat-avatar-rig">
               <div class="avatar-glow" id="avatar-glow"></div>
-              <div class="avatar-face" id="avatar-face">🤖</div>
+              <div class="avatar-face" id="avatar-face">
+                <svg viewBox="0 0 54 44" width="46" height="38" aria-hidden="true">
+                  <ellipse cx="18" cy="22" rx="13" ry="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.6"/>
+                  <ellipse cx="18" cy="22" rx="8" ry="6" fill="#F59E0B"/>
+                  <circle cx="16" cy="20" r="2" fill="#FFFFFF"/>
+                  <ellipse cx="36" cy="22" rx="13" ry="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.6"/>
+                  <ellipse cx="36" cy="22" rx="8" ry="6" fill="#F59E0B"/>
+                  <circle cx="34" cy="20" r="2" fill="#FFFFFF"/>
+                  <rect x="25" y="20" width="4" height="4" fill="#475569" rx="1"/>
+                </svg>
+              </div>
               <div class="avatar-ring ar1" id="avatar-r1"></div>
               <div class="avatar-ring ar2" id="avatar-r2"></div>
             </div>
             <div class="chat-avatar-meta">
               <p class="chat-bot-name">WALL·E</p>
-              <p class="chat-bot-status"><span class="online-dot"></span>Online — always here</p>
+              <p class="chat-bot-status"><span class="online-dot"></span>Online — safe space</p>
               <p class="chat-bot-mood" id="avatar-mood-txt">Ready to listen</p>
               <span class="personality-chip" id="pchip">😊 Friend Mode</span>
             </div>
@@ -504,13 +800,29 @@
             </div>
           </div>
 
+          <!-- Quick Suggestion Prompt Chips -->
+          <div class="chat-quick-chips">
+            <button type="button" class="chat-chip" onclick="AICompanion.quickPrompt('I feel stressed today.')">
+              I feel stressed ›
+            </button>
+            <button type="button" class="chat-chip" onclick="AICompanion.quickPrompt('I need a little motivation.')">
+              I need motivation ›
+            </button>
+            <button type="button" class="chat-chip" onclick="AICompanion.quickPrompt('Just wanted to say hi and chat.')">
+              Just want to chat ›
+            </button>
+            <button type="button" class="chat-chip" onclick="AICompanion.quickPrompt('Can we take a slow breath together?')">
+              Take a slow breath ›
+            </button>
+          </div>
+
           <div class="chat-messages" id="chat-messages"></div>
 
           <div class="chat-input-row">
             <textarea id="chat-input" class="chat-input-field" rows="1"
-              placeholder="Message WALL·E…"
+              placeholder="Message WALL·E… (or tap a prompt above)"
               onkeydown="AICompanion.handleKey(event)"></textarea>
-            <button class="chat-send-btn" onclick="AICompanion.send()">
+            <button class="chat-send-btn" onclick="AICompanion.send()" aria-label="Send message">
               <span>➤</span>
             </button>
           </div>
@@ -523,23 +835,34 @@
       <section id="section-journal" class="page-section">
         <div class="page-header">
           <h2 class="page-title">Wellness Journal</h2>
-          <p class="page-subtitle">Reflect, express, and grow.</p>
+          <p class="page-subtitle">Write what's on your mind. Free of judgment, full of care.</p>
         </div>
 
         <div class="journal-layout motion-reveal">
           <div class="card journal-write-panel glass-panel">
-            <h3 class="card-title" id="journal-form-title">New Entry</h3>
-            <input id="journal-title" class="field-input" type="text" placeholder="Entry title…" />
-            <textarea id="journal-body" class="field-textarea journal-body-area" placeholder="Write your thoughts, feelings, or reflections here…"></textarea>
+            <h3 class="card-title" id="journal-form-title">Write what's on your mind…</h3>
+            <input id="journal-title" class="field-input" type="text" placeholder="Entry title (e.g. Evening thoughts, A quiet step forward)…" />
+            
+            <!-- Tags Selection Bar -->
+            <div class="journal-tags-bar">
+              <span class="journal-tags-label">Add tags:</span>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Gratitude')">Gratitude</button>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Small Wins')">Small Wins</button>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Reflection')">Reflection</button>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Peace')">Peace</button>
+            </div>
+
+            <textarea id="journal-body" class="field-textarea journal-body-area" placeholder="Today I feel…"></textarea>
+            
             <div class="journal-form-actions">
-              <button class="btn-primary" onclick="JournalSystem.saveEntry()">Save Entry</button>
+              <button class="btn-primary" onclick="JournalSystem.saveEntry()">Save Entry →</button>
               <button class="btn-ghost" id="journal-cancel-btn" onclick="JournalSystem.clearForm()" style="display:none">Cancel Edit</button>
             </div>
             <p id="journal-saved-msg" class="feedback-msg"></p>
           </div>
 
           <div class="card journal-entries-panel glass-panel">
-            <h3 class="card-title">Past Entries</h3>
+            <h3 class="card-title">Past Reflections</h3>
             <div id="journal-entries-list" class="journal-entries-list">
               <p class="empty-state">No journal entries yet. Write your first reflection!</p>
             </div>
@@ -552,14 +875,14 @@
       ══════════════════════════════════ -->
       <section id="section-habits" class="page-section">
         <div class="page-header">
-          <h2 class="page-title">Habit Tracker</h2>
-          <p class="page-subtitle">Build consistent wellness routines.</p>
+          <h2 class="page-title">Build Better Routines</h2>
+          <p class="page-subtitle">Care over streaks. Small consistent actions anchor your day.</p>
         </div>
 
         <div class="card mb-4 glass-panel">
           <h3 class="card-title">Add a New Habit</h3>
           <div class="habit-add-row">
-            <input id="new-habit-input" class="field-input" type="text" placeholder="e.g. Morning meditation, 8 glasses of water…" />
+            <input id="new-habit-input" class="field-input" type="text" placeholder="e.g. Morning meditation, 8 glasses of water, 10-minute walk…" />
             <select id="new-habit-icon" class="field-select">
               <option value="🧘">🧘 Meditation</option>
               <option value="🏃">🏃 Exercise</option>
@@ -570,7 +893,7 @@
               <option value="🌿">🌿 Nature</option>
               <option value="🎨">🎨 Creative</option>
             </select>
-            <button class="btn-primary btn-add-habit" onclick="HabitSystem.add()">Add Habit</button>
+            <button class="btn-primary btn-add-habit" onclick="HabitSystem.add()">Add Habit →</button>
           </div>
         </div>
 
@@ -582,9 +905,9 @@
             </div>
           </div>
           <div class="card glass-panel">
-            <h3 class="card-title">🔥 Habit Streaks</h3>
+            <h3 class="card-title">🔥 Gentle Momentum</h3>
             <div id="streaks-list" class="streaks-list">
-              <p class="empty-state">Complete habits to build your streak!</p>
+              <p class="empty-state">Complete habits to build your momentum!</p>
             </div>
           </div>
         </div>
@@ -595,8 +918,22 @@
       ══════════════════════════════════ -->
       <section id="section-moodboost" class="page-section">
         <div class="page-header">
-          <h2 class="page-title">Mood Boost Activities</h2>
+          <h2 class="page-title">Take a break. Reset your mind.</h2>
           <p class="page-subtitle">Science-backed exercises to lift your spirits in minutes.</p>
+        </div>
+
+        <!-- Hero Breathing Showcase Banner -->
+        <div class="card boost-hero-banner glass-panel motion-reveal mb-4">
+          <div class="boost-hero-content">
+            <div class="boost-hero-info">
+              <span class="boost-hero-tag">✦ Reset Activity</span>
+              <h3 class="boost-hero-title">Guided Breathing Exercise</h3>
+              <p class="boost-hero-desc">1–3 min · Activates parasympathetic calm and lowers stress response.</p>
+            </div>
+            <button type="button" class="boost-hero-play-btn" onclick="document.getElementById('breathing-circle').click(); document.getElementById('breathing-circle').scrollIntoView({behavior:'smooth'})" aria-label="Start breathing exercise">
+              <span class="play-icon-tri">▶</span>
+            </button>
+          </div>
         </div>
 
         <div class="boost-grid motion-reveal">
