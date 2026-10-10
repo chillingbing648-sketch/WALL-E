@@ -719,8 +719,8 @@ const AppController = {
       dashboard: 'Dashboard',
       mood: 'Mood Tracker',
       chat: 'AI Companion',
-      journal: 'Wellness Journal',
-      habits: 'Habit Tracker',
+      journal: 'Journal',
+      habits: 'Habits',
       moodboost: 'Mood Boost',
       garden: 'Memory Garden',
       recommendations: 'Insights',
@@ -731,11 +731,11 @@ const AppController = {
       dashboard: "Take a deep breath. You're doing great.",
       mood: 'How are you feeling today? Check in gently.',
       chat: 'Your calm, listening space companion.',
-      journal: "Write what's on your mind. Free of judgment.",
-      habits: 'Care over streaks. Small daily rhythms.',
+      journal: 'A few lines can help make sense of the day.',
+      habits: 'Small actions, practiced at your own pace.',
       moodboost: 'Science-backed exercises to reset your mind.',
       garden: 'Your living sanctuary of growth and wins.',
-      recommendations: 'Gentle patterns and personalized guidance.',
+      recommendations: 'Notice a pattern, then choose a gentle next step.',
       report: 'Reflecting on your wellness progress.',
       sounds: 'Ambient soundscapes to soothe your focus.',
     };
@@ -818,6 +818,7 @@ const MoodSystem = {
     Analytics.updateStats();
     Analytics.updateScore();
     AICompanion.updateAvatar();
+    AnalyticsSystem.renderRecommendations();
     ConstellationSystem.addStar('mood', `Logged mood: ${entry.mood}`);
     MentalWeatherSystem.render();
   },
@@ -827,6 +828,7 @@ const MoodSystem = {
     this.render();
     Analytics.updateStats();
     Analytics.updateScore();
+    AnalyticsSystem.renderRecommendations();
     MentalWeatherSystem.render();
   },
 
@@ -1387,11 +1389,12 @@ const JournalSystem = {
   save(e)     { return Storage.writeUser(KEYS.JOURNAL,_currentUser.username,e); },
 
   saveEntry() {
-    const title=_$('journal-title').value.trim();
+    const titleInput=_$('journal-title');
+    const title=titleInput.value.trim() || `Reflection · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
     const body=_$('journal-body').value.trim();
     const msgEl=_$('journal-saved-msg');
-    if(!title){ msgEl.textContent='⚠ Please add a title.'; msgEl.style.color='var(--c-rose)'; return; }
     if(!body) { msgEl.textContent='⚠ Please write something.'; msgEl.style.color='var(--c-rose)'; return; }
+    const isNewEntry=!_editJournalId;
     const entries=this.get();
     if(_editJournalId){
       const idx=entries.findIndex(e=>e.id===_editJournalId);
@@ -1404,35 +1407,37 @@ const JournalSystem = {
     this.renderList();
     Analytics.updateStats();
     Analytics.updateScore();
-    if(!_editJournalId){
+    if(isNewEntry){
       ConstellationSystem.addStar('journal', `Reflected in journal: ${title}`);
       MemoryGarden.plantFromSource('reflection', title, body);
     }
-    msgEl.textContent='✓ Entry saved & planted in your Memory Garden! 🌱'; msgEl.style.color='var(--c-emerald)';
+    msgEl.textContent='✓ Reflection saved. You can revisit it any time.'; msgEl.style.color='var(--c-emerald)';
     setTimeout(()=>{ msgEl.textContent=''; }, 2500);
   },
 
   clearForm() {
     _$('journal-title').value=''; _$('journal-body').value='';
-    _$('journal-form-title').textContent='New Entry';
+    _$('journal-form-title').textContent='A few lines are enough';
     _$('journal-cancel-btn').style.display='none';
     _editJournalId=null;
   },
 
-  insertTag(tag) {
+  insertPrompt(prompt) {
     const bodyEl = _$('journal-body');
     if (!bodyEl) return;
-    const tagText = `#${tag}`;
-    if (!bodyEl.value.includes(tagText)) {
-      bodyEl.value = bodyEl.value.trim() ? `${bodyEl.value.trim()}\n\n${tagText} ` : `${tagText} `;
-    }
+    const start=bodyEl.selectionStart ?? bodyEl.value.length;
+    const end=bodyEl.selectionEnd ?? start;
+    const prefix=bodyEl.value.slice(0,start);
+    const spacing=prefix && !/\s$/.test(prefix) ? '\n\n' : '';
+    const text=`${spacing}${prompt}`;
+    bodyEl.setRangeText(text,start,end,'end');
     bodyEl.focus();
   },
 
   edit(id) {
     const e=this.get().find(e=>e.id===id); if(!e) return;
     _$('journal-title').value=e.title; _$('journal-body').value=e.body;
-    _$('journal-form-title').textContent='Edit Entry';
+    _$('journal-form-title').textContent='Edit reflection';
     _$('journal-cancel-btn').style.display='inline-flex';
     _editJournalId=id;
     _qs('.journal-write-panel').scrollIntoView({behavior:'smooth',block:'start'});
@@ -1446,7 +1451,8 @@ const JournalSystem = {
 
   renderList() {
     const el=_$('journal-entries-list'), entries=this.get();
-    if(!entries.length){ el.innerHTML='<p class="empty-state">No journal entries yet. Write your first reflection!</p>'; return; }
+    _setText('journal-entry-count',`${entries.length} ${entries.length===1?'entry':'entries'}`);
+    if(!entries.length){ el.innerHTML='<p class="empty-state">Your saved reflections will appear here. Start with just one thought.</p>'; return; }
     el.innerHTML=entries.map(e=>{
       const dt=new Date(e.timestamp);
       const ds=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -1509,7 +1515,7 @@ const HabitSystem = {
 
   renderList() {
     const el=_$('habits-list'), habits=this.get(), log=this.getLog(), today=log[_todayKey()]||[];
-    if(!habits.length){ el.innerHTML='<p class="empty-state">No habits yet. Add your first wellness habit above!</p>'; return; }
+    if(!habits.length){ el.innerHTML='<p class="empty-state">No habits yet. Add one small action you would like to practice.</p>'; return; }
     el.innerHTML=habits.map(h=>{
       const done=today.includes(h.id);
       return `
@@ -1525,7 +1531,7 @@ const HabitSystem = {
   renderStreaks() {
     const el=_$('streaks-list');
     const ws=this.get().map(h=>({...h,streak:this.calcStreak(h.id)})).filter(h=>h.streak>0).sort((a,b)=>b.streak-a.streak);
-    if(!ws.length){ el.innerHTML='<p class="empty-state">Complete habits to build your streak!</p>'; return; }
+    if(!ws.length){ el.innerHTML='<p class="empty-state">When you complete a habit, its current rhythm will show up here.</p>'; return; }
     el.innerHTML=ws.map(h=>`
       <div class="streak-tile">
         <span class="streak-tile-icon">${h.icon}</span>
@@ -1767,8 +1773,15 @@ const AnalyticsSystem = {
       dominant=Object.keys(freq).sort((a,b)=>freq[b]-freq[a])[0];
     }
     const recs=this.RECS[dominant]||this.RECS.Neutral;
-    const label=`<div style="margin-bottom:14px;"><span style="font-size:0.72rem;color:var(--text-2);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Based on your recent mood:</span><span class="mood-chip ${dominant}" style="margin-left:8px;">${MOOD_EMOJI[dominant]} ${dominant}</span></div>`;
-    el.innerHTML=label+recs.map(r=>`<div class="rec-card type-${r.type}"><div class="rec-card-icon">${r.icon}</div><div class="rec-card-title">${r.title}</div><div class="rec-card-desc">${r.desc}</div></div>`).join('');
+    const recentCount=Math.min(validMoods.length,3);
+    const context=validMoods.length===1
+      ? `Based on your most recent mood check-in: ${MOOD_EMOJI[dominant]} ${dominant}.`
+      : validMoods.length
+        ? `Based on your ${recentCount} most recent mood check-ins. ${MOOD_EMOJI[dominant]} ${dominant} was most frequent.`
+      : 'No mood check-ins yet. These are general ideas for now; log a mood whenever you are ready for suggestions shaped by your recent check-ins.';
+    const label=validMoods.length?`Your recent check-ins`:'A gentle place to start';
+    const note=`<div class="insight-context-note"><span class="insight-context-icon" aria-hidden="true">✦</span><div><p class="insight-context-title">${label}</p><p class="insight-context-copy">${context}</p></div></div>`;
+    el.innerHTML=note+recs.map(r=>`<article class="rec-card type-${r.type}"><div class="rec-card-icon" aria-hidden="true">${r.icon}</div><h3 class="rec-card-title">${r.title}</h3><p class="rec-card-desc">${r.desc}</p></article>`).join('');
   },
 
   /* ── Affirmations (Insights page) ─────────────────────── */

@@ -848,37 +848,48 @@
       ══════════════════════════════════ -->
       <section id="section-journal" class="page-section">
         <div class="page-header">
-          <h2 class="page-title">Wellness Journal</h2>
-          <p class="page-subtitle">Write what's on your mind. Free of judgment, full of care.</p>
+          <h2 class="page-title">Journal</h2>
+          <p class="page-subtitle">Put thoughts into words to name feelings, notice needs, and see what changes over time.</p>
+        </div>
+
+        <div class="section-purpose purpose-journal">
+          <span class="section-purpose-icon" aria-hidden="true">✎</span>
+          <div><span class="section-purpose-label">Why it helps</span><p>Writing can make a busy thought feel easier to understand. A few lines are enough; there is no right way to do it.</p></div>
         </div>
 
         <div class="journal-layout motion-reveal">
           <div class="card journal-write-panel glass-panel">
-            <h3 class="card-title" id="journal-form-title">Write what's on your mind…</h3>
-            <input id="journal-title" class="field-input" type="text" placeholder="Entry title (e.g. Evening thoughts, A quiet step forward)…" />
+            <h3 class="card-title" id="journal-form-title">A few lines are enough</h3>
+            <p class="panel-caption">Capture a moment, a feeling, or something you want to remember.</p>
+            <label class="field-label" for="journal-title">Title <span class="field-optional">Optional</span></label>
+            <input id="journal-title" class="field-input" type="text" placeholder="Add a title or leave it blank" />
             
-            <!-- Tags Selection Bar -->
+            <!-- Gentle prompts insert a sentence starter at the cursor. -->
             <div class="journal-tags-bar">
-              <span class="journal-tags-label">Add tags:</span>
-              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Gratitude')">Gratitude</button>
-              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Small Wins')">Small Wins</button>
-              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Reflection')">Reflection</button>
-              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertTag('Peace')">Peace</button>
+              <span class="journal-tags-label">Need a starting point?</span>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertPrompt('One small thing I appreciated today was…')">Gratitude</button>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertPrompt('A small thing I did well today was…')">Small win</button>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertPrompt('Something on my mind is…')">Reflection</button>
+              <button type="button" class="journal-tag-btn" onclick="JournalSystem.insertPrompt('A moment I felt at ease was…')">A calm moment</button>
             </div>
 
-            <textarea id="journal-body" class="field-textarea journal-body-area" placeholder="Today I feel…"></textarea>
+            <label class="field-label" for="journal-body">Your reflection</label>
+            <textarea id="journal-body" class="field-textarea journal-body-area" placeholder="What stood out to you today?"></textarea>
             
             <div class="journal-form-actions">
-              <button class="btn-primary" onclick="JournalSystem.saveEntry()">Save Entry →</button>
+              <button class="btn-primary" onclick="JournalSystem.saveEntry()">Save reflection →</button>
               <button class="btn-ghost" id="journal-cancel-btn" onclick="JournalSystem.clearForm()" style="display:none">Cancel Edit</button>
             </div>
             <p id="journal-saved-msg" class="feedback-msg"></p>
           </div>
 
           <div class="card journal-entries-panel glass-panel">
-            <h3 class="card-title">Past Reflections</h3>
+            <div class="journal-list-heading">
+              <div><h3 class="card-title">Your reflections</h3><p class="panel-caption">Look back for recurring feelings, needs, or change.</p></div>
+              <span class="journal-entry-count" id="journal-entry-count">0 entries</span>
+            </div>
             <div id="journal-entries-list" class="journal-entries-list">
-              <p class="empty-state">No journal entries yet. Write your first reflection!</p>
+              <p class="empty-state">Your saved reflections will appear here. Start with just one thought.</p>
             </div>
           </div>
         </div>
@@ -889,39 +900,53 @@
       ══════════════════════════════════ -->
       <section id="section-habits" class="page-section">
         <div class="page-header">
-          <h2 class="page-title">Build Better Routines</h2>
-          <p class="page-subtitle">Care over streaks. Small consistent actions anchor your day.</p>
+          <h2 class="page-title">Habits that fit real life</h2>
+          <p class="page-subtitle">Choose a small act of care you can return to on an ordinary day.</p>
         </div>
 
-        <div class="card mb-4 glass-panel">
-          <h3 class="card-title">Add a New Habit</h3>
-          <div class="habit-add-row">
-            <input id="new-habit-input" class="field-input" type="text" placeholder="e.g. Morning meditation, 8 glasses of water, 10-minute walk…" />
-            <select id="new-habit-icon" class="field-select">
-              <option value="🧘">🧘 Meditation</option>
-              <option value="🏃">🏃 Exercise</option>
-              <option value="💧">💧 Water</option>
-              <option value="📚">📚 Reading</option>
-              <option value="😴">😴 Sleep</option>
-              <option value="🥗">🥗 Nutrition</option>
-              <option value="🌿">🌿 Nature</option>
-              <option value="🎨">🎨 Creative</option>
-            </select>
-            <button class="btn-primary btn-add-habit" onclick="HabitSystem.add()">Add Habit →</button>
-          </div>
+        <div class="section-purpose purpose-habits">
+          <span class="section-purpose-icon" aria-hidden="true">↻</span>
+          <div><span class="section-purpose-label">How to use this space</span><p>Pick one small action, check it off when you do it, and use the rhythm as information—not a measure of your worth.</p></div>
         </div>
+
+        <form class="card mb-4 glass-panel habit-create-card" onsubmit="event.preventDefault(); HabitSystem.add()">
+          <h3 class="card-title">Choose your next small step</h3>
+          <p class="panel-caption">Make it specific and easy to repeat. You can change it any time.</p>
+          <div class="habit-add-row">
+            <div class="habit-field">
+              <label class="field-label" for="new-habit-input">A small action</label>
+              <input id="new-habit-input" class="field-input" type="text" placeholder="e.g. Stretch for two minutes" autocomplete="off" />
+            </div>
+            <div class="habit-field habit-field-icon">
+              <label class="field-label" for="new-habit-icon">Category</label>
+              <select id="new-habit-icon" class="field-select">
+                <option value="🧘">🧘 Meditation</option>
+                <option value="🏃">🏃 Exercise</option>
+                <option value="💧">💧 Water</option>
+                <option value="📚">📚 Reading</option>
+                <option value="😴">😴 Sleep</option>
+                <option value="🥗">🥗 Nutrition</option>
+                <option value="🌿">🌿 Nature</option>
+                <option value="🎨">🎨 Creative</option>
+              </select>
+            </div>
+            <button class="btn-primary btn-add-habit" type="submit">Add habit →</button>
+          </div>
+        </form>
 
         <div class="habits-layout motion-reveal">
           <div class="card glass-panel">
-            <h3 class="card-title">Today's Habits</h3>
+            <h3 class="card-title">Today</h3>
+            <p class="panel-caption">Check off what you complete; unfinished items can wait.</p>
             <div id="habits-list" class="habits-list">
-              <p class="empty-state">No habits yet. Add your first wellness habit above!</p>
+              <p class="empty-state">No habits yet. Add one small action you would like to practice.</p>
             </div>
           </div>
           <div class="card glass-panel">
-            <h3 class="card-title">🔥 Gentle Momentum</h3>
+            <h3 class="card-title">Your rhythm</h3>
+            <p class="panel-caption">Consecutive-day streaks can help you notice what is becoming familiar. A pause does not erase your progress.</p>
             <div id="streaks-list" class="streaks-list">
-              <p class="empty-state">Complete habits to build your momentum!</p>
+              <p class="empty-state">When you complete a habit, its current rhythm will show up here.</p>
             </div>
           </div>
         </div>
@@ -1157,11 +1182,16 @@
       ══════════════════════════════════ -->
       <section id="section-recommendations" class="page-section">
         <div class="page-header">
-          <h2 class="page-title">Wellness Insights</h2>
-          <p class="page-subtitle">Personalized suggestions based on your mood patterns.</p>
+          <h2 class="page-title">Insights</h2>
+          <p class="page-subtitle">Use recent check-ins to find a small next step that feels right for you.</p>
         </div>
 
-        <div id="recommendations-container" class="rec-grid motion-reveal"></div>
+        <div class="section-purpose purpose-insights">
+          <span class="section-purpose-icon" aria-hidden="true">✦</span>
+          <div><span class="section-purpose-label">What this section is for</span><p>Noticing patterns can show what supports you. Suggestions are reflection prompts—not scores or diagnoses—so keep what fits and skip the rest.</p></div>
+        </div>
+
+        <div id="recommendations-container" class="rec-grid motion-reveal" aria-live="polite"></div>
 
         <div class="insights-bottom-row">
           <div class="card affirmation-card glass-panel">

@@ -927,6 +927,23 @@ button:disabled, button[aria-disabled="true"] {
   letter-spacing: var(--tracking-normal);
   max-width: 62ch;
 }
+.section-purpose {
+  display: flex; align-items: center; gap: 14px;
+  max-width: 980px; margin: -10px 0 22px; padding: 14px 17px;
+  border: 1px solid rgba(115, 200, 193, .16); border-radius: var(--r-md);
+  background: linear-gradient(105deg, rgba(115, 200, 193, .075), rgba(99, 102, 241, .035) 72%, transparent);
+}
+.section-purpose-icon {
+  display: grid; place-items: center; flex: 0 0 38px; height: 38px;
+  border-radius: 12px; background: rgba(115, 200, 193, .12);
+  color: var(--accent-teal-light); font-size: 1.05rem;
+}
+.purpose-journal .section-purpose-icon { background: rgba(167, 139, 250, .12); color: #c4b5fd; }
+.purpose-insights .section-purpose-icon { background: rgba(130, 188, 232, .12); color: #a9d5fa; }
+.section-purpose-label { display: block; margin-bottom: 2px; color: var(--text-primary); font-size: .77rem; font-weight: 700; }
+.section-purpose p { color: var(--text-secondary); font-size: .79rem; line-height: 1.5; }
+.panel-caption { margin: -10px 0 16px; color: var(--text-muted); font-size: .78rem; line-height: 1.5; }
+.field-optional { margin-left: 5px; color: var(--text-muted); font-size: .75rem; font-weight: 400; }
 
 /* ─── 10. CARD SYSTEM ───────────────────────────────────────── */
 .card {
@@ -1825,6 +1842,8 @@ button:disabled, button[aria-disabled="true"] {
   gap: 18px;
 }
 .journal-write-panel .field-input { margin-bottom: 12px; }
+.journal-write-panel .card-title { margin-bottom: 12px; }
+.journal-write-panel > .panel-caption { margin: -5px 0 18px; }
 .journal-tags-bar {
   display: flex;
   align-items: center;
@@ -1860,6 +1879,14 @@ button:disabled, button[aria-disabled="true"] {
   transform: scale(0.96);
 }
 .journal-body-area { min-height: 190px; }
+.journal-write-panel > .field-label { display: block; margin-bottom: 7px; }
+.journal-list-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.journal-list-heading .card-title { margin-bottom: 12px; }
+.journal-list-heading .panel-caption { margin: -6px 0 18px; }
+.journal-entry-count {
+  flex: 0 0 auto; padding: 5px 9px; border: 1px solid var(--border);
+  border-radius: var(--r-full); color: var(--text-muted); font-size: .7rem; font-weight: 600;
+}
 .journal-form-actions { display: flex; gap: 10px; margin-top: 14px; }
 .journal-form-actions .btn-primary { flex: 1; }
 
@@ -1884,10 +1911,17 @@ button:disabled, button[aria-disabled="true"] {
 .journal-entry-actions { display: flex; gap: 8px; margin-top: 10px; }
 
 /* ─── 17. HABIT TRACKER ─────────────────────────────────────── */
-.habit-add-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.habit-create-card .card-title { margin-bottom: 12px; }
+.habit-create-card > .panel-caption { margin: -5px 0 18px; }
+.habit-add-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.habit-field { display: flex; flex: 1 1 240px; min-width: 190px; flex-direction: column; gap: 6px; }
+.habit-field .field-label { margin-bottom: 0; }
+.habit-field-icon { flex: 0 1 200px; min-width: 165px; }
 .habit-add-row .field-input { flex: 1; min-width: 180px; }
+.habit-field .field-input { width: 100%; min-width: 0; }
 .field-select { width: auto; flex-shrink: 0; padding: 11px 12px; }
-.btn-add-habit { white-space: nowrap; }
+.habit-field .field-select { width: 100%; min-height: 45px; }
+.btn-add-habit { min-height: 45px; white-space: nowrap; }
 
 .habits-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .habits-list, .streaks-list { display: flex; flex-direction: column; gap: 8px; }
@@ -2226,6 +2260,14 @@ button:disabled, button[aria-disabled="true"] {
   gap: 14px;
   margin-bottom: 20px;
 }
+.insight-context-note {
+  display: flex; align-items: flex-start; gap: 12px; grid-column: 1 / -1;
+  padding: 13px 16px; border-radius: var(--r-md);
+  border: 1px solid rgba(130, 188, 232, .16); background: rgba(56, 94, 146, .08);
+}
+.insight-context-icon { flex: 0 0 auto; color: #a9d5fa; font-size: 1rem; line-height: 1.5; }
+.insight-context-title { color: var(--text-primary); font-size: .78rem; font-weight: 700; }
+.insight-context-copy { margin-top: 2px; color: var(--text-secondary); font-size: .77rem; line-height: 1.5; }
 .rec-card {
   background: var(--bg-card);
   backdrop-filter: blur(20px);
