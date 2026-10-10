@@ -80,6 +80,12 @@ let _editJournalId   = null;
 function _$  (id)   { return document.getElementById(id); }
 function _qs (sel)  { return document.querySelector(sel); }
 function _qsa(sel)  { return document.querySelectorAll(sel); }
+function _encodePassword(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+  bytes.forEach(byte => { binary += String.fromCharCode(byte); });
+  return btoa(binary);
+}
 function _setText(id, val) { const e=_$(id); if(e) e.textContent = val; }
 function _setWidth(id, pct){ const e=_$(id); if(e) e.style.width = Math.min(pct,100)+'%'; }
 function _esc(str)  { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -143,6 +149,8 @@ const MotionSystem = {
   _transient: new Set(),
   _countTweens: new Map(),
   _wallETween: null,
+  _authTimeline: null,
+  _authLoops: [],
   _initialized: false,
 
   reduced() { return !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches; },
@@ -165,12 +173,14 @@ const MotionSystem = {
 
     window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', event => {
       if (event.matches) {
+        this.stopAuthMotion();
         this._contexts.forEach(context => context.revert());
         this._contexts.clear();
         this.stopTransient();
         this.finishCounts();
         this.stopCompanionLife();
       } else {
+        this.initAuthMotion();
         this.initCompanionLife();
         const active = _qs('.page-section.active');
         if (active) this.show(active, active);
@@ -182,17 +192,30 @@ const MotionSystem = {
     if (!window.gsap || this.reduced()) return;
     const screen = _$('auth-screen');
     if (!screen || screen.style.display === 'none') return;
+    this.stopAuthMotion();
     const gsap = window.gsap;
     gsap.set('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge', { autoAlpha: 0, y: 16 });
     gsap.set('.auth-brand-logo-row, .auth-brand-tagline', { autoAlpha: 0, y: 10 });
     gsap.set('.auth-card', { autoAlpha: 0, y: 22, scale: .985 });
-    gsap.timeline({ defaults: { ease: 'power3.out' } })
+    this._authTimeline = gsap.timeline({ defaults: { ease: 'power3.out' } })
       .to('.auth-brand-logo-row, .auth-brand-tagline', { autoAlpha: 1, y: 0, duration: .55, stagger: .1 })
       .to('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge', { autoAlpha: 1, y: 0, duration: .62, stagger: .1 }, '-=.32')
       .to('.auth-card', { autoAlpha: 1, y: 0, scale: 1, duration: .72, clearProps: 'transform' }, '-=.68');
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      gsap.to('.auth-ambient-orb', { x: 18, y: -12, duration: 8, ease: 'sine.inOut', yoyo: true, repeat: -1, stagger: 2 });
+      this._authLoops = [
+        gsap.to('.auth-ambient-orb', { x: 18, y: -12, duration: 8, ease: 'sine.inOut', yoyo: true, repeat: -1, stagger: 2 }),
+        gsap.to('.auth-bot-art', { y: -1.5, duration: 2.8, ease: 'sine.inOut', yoyo: true, repeat: -1 }),
+        gsap.to('.auth-guiding-star', { scale: .92, transformOrigin: '50% 50%', duration: 2.2, ease: 'sine.inOut', yoyo: true, repeat: -1 })
+      ];
     }
+  },
+
+  stopAuthMotion() {
+    this._authTimeline?.kill();
+    this._authTimeline = null;
+    this._authLoops.forEach(tween => tween.kill());
+    this._authLoops = [];
+    window.gsap?.set('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge, .auth-brand-logo-row, .auth-brand-tagline, .auth-card, .auth-ambient-orb, .auth-bot-art, .auth-guiding-star', { clearProps: 'opacity,visibility,transform' });
   },
 
   _track(tween) {
@@ -223,6 +246,7 @@ const MotionSystem = {
   },
 
   cleanup() {
+    this.stopAuthMotion();
     this._contexts.forEach(context => context.revert());
     this._contexts.clear();
     this.stopTransient();
@@ -571,18 +595,10 @@ const AppController = {
     button.setAttribute('aria-pressed', String(visible));
   },
 
-  startJourney() {
-    const user = _$('login-username')?.value.trim();
-    const pass = _$('login-password')?.value;
-    if (user && pass) {
-      this.login();
-      return;
-    }
-    if (!_$('login-form').classList.contains('active')) {
-      this.toggleAuth();
-    }
-    if (_$('login-username')) _$('login-username').value = 'demo';
-    if (_$('login-password')) _$('login-password').value = 'demo1234';
+  loginDemo() {
+    _$('login-username').value = 'demo';
+    _$('login-password').value = 'demo1234';
+    _$('login-error').textContent = '';
     this.login();
   },
 
@@ -590,10 +606,19 @@ const AppController = {
     const user = _$('login-username').value.trim();
     const pass = _$('login-password').value;
     const err  = _$('login-error');
-    if (!user||!pass) { err.textContent='Please fill in all fields.'; return; }
+    if (!user||!pass) {
+      err.textContent='Enter your username and password to continue.';
+      (!user ? _$('login-username') : _$('login-password')).focus();
+      return;
+    }
     const users = this.getUsers();
     const rec   = users[user.toLowerCase()];
-    if (!rec || typeof rec.name!=='string' || !rec.name.trim() || rec.password !== btoa(pass)) { err.textContent='Invalid username or password.'; return; }
+    if (!rec || typeof rec.name!=='string' || !rec.name.trim() || rec.password !== _encodePassword(pass)) {
+      err.textContent='That username and password don’t match. Try again.';
+      _$('login-password').focus();
+      _$('login-password').select();
+      return;
+    }
     _currentUser = { username: user.toLowerCase(), name: rec.name };
     Storage.writeJSON(KEYS.CURRENT,_currentUser);
     this._launch();
@@ -604,12 +629,16 @@ const AppController = {
     const user = _$('signup-username').value.trim();
     const pass = _$('signup-password').value;
     const err  = _$('signup-error');
-    if (!name||!user||!pass) { err.textContent='Please fill in all fields.'; return; }
-    if (user.length<3) { err.textContent='Username must be at least 3 characters.'; return; }
-    if (pass.length<4) { err.textContent='Password must be at least 4 characters.'; return; }
+    if (!name||!user||!pass) {
+      err.textContent='Complete each field to create your account.';
+      (!name ? _$('signup-name') : !user ? _$('signup-username') : _$('signup-password')).focus();
+      return;
+    }
+    if (user.length<3) { err.textContent='Choose a username with at least 3 characters.'; _$('signup-username').focus(); return; }
+    if (pass.length<4) { err.textContent='Choose a password with at least 4 characters.'; _$('signup-password').focus(); return; }
     const users = this.getUsers();
-    if (Object.prototype.hasOwnProperty.call(users,user.toLowerCase())) { err.textContent='Username already taken.'; return; }
-    Object.defineProperty(users,user.toLowerCase(),{value:{name,password:btoa(pass)},writable:true,enumerable:true,configurable:true});
+    if (Object.prototype.hasOwnProperty.call(users,user.toLowerCase())) { err.textContent='That username is already in use. Try another.'; _$('signup-username').focus(); _$('signup-username').select(); return; }
+    Object.defineProperty(users,user.toLowerCase(),{value:{name,password:_encodePassword(pass)},writable:true,enumerable:true,configurable:true});
     if(!this.saveUsers(users)) { err.textContent='Could not save your account on this device.'; return; }
     _currentUser = { username: user.toLowerCase(), name };
     Storage.writeJSON(KEYS.CURRENT,_currentUser);
@@ -631,6 +660,7 @@ const AppController = {
     _currentUser = null;
     _$('app').classList.add('hidden');
     _$('auth-screen').style.display='flex';
+    MotionSystem.initAuthMotion();
     _$('login-username').value='';
     _$('login-password').value='';
     _$('login-error').textContent='';
@@ -638,6 +668,7 @@ const AppController = {
   },
 
   _launch() {
+    MotionSystem.stopAuthMotion();
     _$('auth-screen').style.display='none';
     _$('app').classList.remove('hidden');
 
@@ -2601,21 +2632,12 @@ function init() {
 
   /* Seed demo account */
   const users=AppController.getUsers();
-  if(!Object.keys(users).length){
+  if(!Object.prototype.hasOwnProperty.call(users,'demo')){
     Object.defineProperty(users,'demo',{value:{name:'Demo User',password:btoa('demo1234')},writable:true,enumerable:true,configurable:true});
     AppController.saveUsers(users);
   }
 
   /* Restore session */
-  document.querySelectorAll('#login-form input, #signup-form input').forEach(input => {
-    input.addEventListener('keydown', event => {
-      if (event.key !== 'Enter') return;
-      event.preventDefault();
-      if (_$('signup-form').classList.contains('active')) AppController.signup();
-      else AppController.login();
-    });
-  });
-
   const saved=Storage.readJSON(KEYS.CURRENT,null);
   if(saved){
     if(typeof saved.username==='string'&&typeof saved.name==='string'&&saved.name.trim()) { _currentUser=saved; AppController._launch(); }

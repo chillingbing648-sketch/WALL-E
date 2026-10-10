@@ -33,7 +33,7 @@
       <!-- Left: Art-Directed Brand Manifesto -->
       <div class="auth-brand-hero">
         <div class="auth-brand-logo-row">
-          <span class="auth-brand-sprout" aria-hidden="true">🌱</span>
+          <span class="auth-brand-symbol" aria-hidden="true">✦</span>
           <span class="auth-brand-name">WALL·E</span>
         </div>
         <p class="auth-brand-tagline">A private space for your wellbeing</p>
@@ -61,22 +61,55 @@
       <!-- Right: Authentication Card -->
       <div class="auth-card-panel">
         <div class="auth-card glass-panel">
-          <!-- Mini WALL-E Sunset Mascot -->
+          <!-- WALL·E companion with a quiet guiding star -->
           <div class="auth-mascot-row">
             <div class="auth-mascot-visual">
-              <svg viewBox="0 0 100 80" class="auth-mascot-svg" aria-hidden="true">
-                <circle cx="50" cy="40" r="32" fill="radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%)"/>
-                <!-- Binocular Eyes -->
-                <ellipse cx="36" cy="36" rx="14" ry="11" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5"/>
-                <ellipse cx="36" cy="36" rx="9" ry="7" fill="#F59E0B" opacity="0.9"/>
-                <circle cx="34" cy="34" r="2" fill="#FFFFFF"/>
-                <ellipse cx="64" cy="36" rx="14" ry="11" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5"/>
-                <ellipse cx="64" cy="36" rx="9" ry="7" fill="#F59E0B" opacity="0.9"/>
-                <circle cx="62" cy="34" r="2" fill="#FFFFFF"/>
-                <rect x="46" y="33" width="8" height="6" fill="#334155" rx="1"/>
-                <!-- Plant Sprout beside him -->
-                <path d="M 82 50 Q 86 38 90 32" stroke="#10B981" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                <path d="M 90 34 Q 96 30 98 27 Q 94 34 89 35 Z" fill="#10B981"/>
+              <svg viewBox="0 0 160 112" class="auth-mascot-svg" role="img" aria-label="WALL·E beside a softly glowing star">
+                <defs>
+                  <linearGradient id="auth-bot-shell" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#d6bc78"/><stop offset="1" stop-color="#9f8654"/>
+                  </linearGradient>
+                  <linearGradient id="auth-bot-metal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#52657a"/><stop offset="1" stop-color="#253448"/>
+                  </linearGradient>
+                  <radialGradient id="auth-bot-lens" cx="35%" cy="28%" r="75%">
+                    <stop offset="0" stop-color="#dbfff2"/><stop offset=".35" stop-color="#80d7b7"/><stop offset="1" stop-color="#2d806d"/>
+                  </radialGradient>
+                  <radialGradient id="auth-star-glow">
+                    <stop offset="0" stop-color="#b6ddff" stop-opacity=".3"/><stop offset="1" stop-color="#b6ddff" stop-opacity="0"/>
+                  </radialGradient>
+                  <filter id="auth-bot-shadow" x="-30%" y="-30%" width="160%" height="180%">
+                    <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#050a13" flood-opacity=".45"/>
+                  </filter>
+                </defs>
+                <ellipse cx="75" cy="99" rx="45" ry="6" fill="#050a13" opacity=".42"/>
+                <g class="auth-bot-art" filter="url(#auth-bot-shadow)">
+                  <!-- friendly binocular head -->
+                  <path d="M54 17 49 9m5 8 9-8" fill="none" stroke="#8797a7" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="49" cy="8" r="2" fill="#86d8bb"/><circle cx="63" cy="8" r="2" fill="#86d8bb"/>
+                  <rect x="37" y="18" width="50" height="38" rx="11" fill="url(#auth-bot-shell)" stroke="#e2d2a5" stroke-width="1.5"/>
+                  <rect x="43" y="23" width="18" height="25" rx="8" fill="#243449" stroke="#8392a2" stroke-width="2"/>
+                  <rect x="64" y="23" width="18" height="25" rx="8" fill="#243449" stroke="#8392a2" stroke-width="2"/>
+                  <ellipse cx="52" cy="35" rx="6.7" ry="9" fill="url(#auth-bot-lens)"/>
+                  <ellipse cx="73" cy="35" rx="6.7" ry="9" fill="url(#auth-bot-lens)"/>
+                  <circle cx="50" cy="31" r="2" fill="#f3fffb" opacity=".9"/><circle cx="71" cy="31" r="2" fill="#f3fffb" opacity=".9"/>
+                  <rect x="61" y="31" width="3" height="7" rx="1.5" fill="#52657a"/>
+                  <!-- compact body and tank treads -->
+                  <path d="M46 57h35l8 27H39z" fill="url(#auth-bot-shell)" stroke="#d4c18f" stroke-width="1.5"/>
+                  <rect x="47" y="62" width="32" height="17" rx="4" fill="url(#auth-bot-metal)"/>
+                  <text x="63" y="73" text-anchor="middle" fill="#d9e2eb" font-size="5.5" font-family="Inter, sans-serif" font-weight="700" letter-spacing=".7">WALL·E</text>
+                  <path d="M39 82h48a7 7 0 0 1 0 14H39a7 7 0 0 1 0-14Z" fill="#1d2938" stroke="#667789" stroke-width="1.5"/>
+                  <path d="M46 84v10m9-10v10m9-10v10m9-10v10m9-10v10" stroke="#607186" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M38 64 31 72m52-8 7 8" stroke="#9aa8b7" stroke-width="4" stroke-linecap="round"/>
+                  <circle cx="32" cy="73" r="3" fill="#c7d2de"/><circle cx="89" cy="73" r="3" fill="#c7d2de"/>
+                </g>
+                <!-- guiding star: a quiet point of focus for the wellness theme -->
+                <g class="auth-guiding-star">
+                  <circle cx="119" cy="45" r="22" fill="url(#auth-star-glow)"/>
+                  <path d="M119 31c2.3 8.2 4.8 10.7 13 13-8.2 2.3-10.7 4.8-13 13-2.3-8.2-4.8-10.7-13-13 8.2-2.3 10.7-4.8 13-13Z" fill="#c6e5ff"/>
+                  <circle cx="136" cy="61" r="2" fill="#92d8bf"/>
+                  <circle cx="106" cy="25" r="1.5" fill="#92d8bf" opacity=".85"/>
+                </g>
               </svg>
             </div>
             <div class="auth-mascot-text">
@@ -86,43 +119,45 @@
           </div>
 
           <!-- Login Form -->
-          <div id="login-form" class="auth-form active">
+          <form id="login-form" class="auth-form active" onsubmit="event.preventDefault(); AppController.login()">
             <div class="field-group">
               <label class="field-label" for="login-username">Username</label>
-              <input class="field-input" type="text" id="login-username" placeholder="Your username" autocomplete="username" required />
+              <input class="field-input" type="text" id="login-username" placeholder="Your username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
             </div>
             <div class="field-group">
               <label class="field-label" for="login-password">Password</label>
               <div class="auth-password-wrap"><input class="field-input" type="password" id="login-password" placeholder="Your password" autocomplete="current-password" required /><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false" onclick="AppController.togglePassword('login-password', this)">Show</button></div>
             </div>
             <p id="login-error" class="form-error" role="alert" aria-live="polite"></p>
-            <button class="btn-primary btn-full" type="button" onclick="AppController.login()">Sign in <span aria-hidden="true">→</span></button>
+            <button class="btn-primary btn-full" type="submit">Sign in <span aria-hidden="true">→</span></button>
             <div class="auth-footer-links">
               <p class="auth-hint">New to WALL·E? Create a free account to get started.</p>
               <p class="auth-switch">Don't have an account? <a href="#signup" onclick="event.preventDefault(); AppController.toggleAuth()">Create account</a></p>
+              <div class="auth-demo-divider"><span>or</span></div>
+              <button class="auth-demo-btn" type="button" onclick="AppController.loginDemo()">Explore the demo <span aria-hidden="true">↗</span></button>
             </div>
-          </div>
+          </form>
 
           <!-- Sign-Up Form -->
-          <div id="signup-form" class="auth-form">
+          <form id="signup-form" class="auth-form" onsubmit="event.preventDefault(); AppController.signup()">
             <div class="field-group">
               <label class="field-label" for="signup-name">Full Name</label>
               <input class="field-input" type="text" id="signup-name" placeholder="Your name" autocomplete="name" required />
             </div>
             <div class="field-group">
               <label class="field-label" for="signup-username">Username</label>
-              <input class="field-input" type="text" id="signup-username" placeholder="Choose a username" autocomplete="username" required />
+              <input class="field-input" type="text" id="signup-username" placeholder="Choose a username" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" required />
             </div>
             <div class="field-group">
               <label class="field-label" for="signup-password">Password</label>
-              <div class="auth-password-wrap"><input class="field-input" type="password" id="signup-password" placeholder="At least 4 characters" autocomplete="new-password" required /><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false" onclick="AppController.togglePassword('signup-password', this)">Show</button></div>
+              <div class="auth-password-wrap"><input class="field-input" type="password" id="signup-password" placeholder="At least 4 characters" autocomplete="new-password" minlength="4" required /><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false" onclick="AppController.togglePassword('signup-password', this)">Show</button></div>
             </div>
             <p id="signup-error" class="form-error" role="alert" aria-live="polite"></p>
-            <button class="btn-primary btn-full" type="button" onclick="AppController.signup()">Create account <span aria-hidden="true">→</span></button>
+            <button class="btn-primary btn-full" type="submit">Create account <span aria-hidden="true">→</span></button>
             <div class="auth-footer-links">
               <p class="auth-switch">Already have an account? <a href="#login" onclick="event.preventDefault(); AppController.toggleAuth()">Sign in</a></p>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
