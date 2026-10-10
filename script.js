@@ -155,6 +155,8 @@ const MotionSystem = {
     }
     document.documentElement.classList.toggle('motion-gsap', !!window.gsap);
 
+    this.initAuthMotion();
+
     // Initial companion life
     this.initCompanionLife();
 
@@ -174,6 +176,23 @@ const MotionSystem = {
         if (active) this.show(active, active);
       }
     });
+  },
+
+  initAuthMotion() {
+    if (!window.gsap || this.reduced()) return;
+    const screen = _$('auth-screen');
+    if (!screen || screen.style.display === 'none') return;
+    const gsap = window.gsap;
+    gsap.set('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge', { autoAlpha: 0, y: 16 });
+    gsap.set('.auth-brand-logo-row, .auth-brand-tagline', { autoAlpha: 0, y: 10 });
+    gsap.set('.auth-card', { autoAlpha: 0, y: 22, scale: .985 });
+    gsap.timeline({ defaults: { ease: 'power3.out' } })
+      .to('.auth-brand-logo-row, .auth-brand-tagline', { autoAlpha: 1, y: 0, duration: .55, stagger: .1 })
+      .to('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge', { autoAlpha: 1, y: 0, duration: .62, stagger: .1 }, '-=.32')
+      .to('.auth-card', { autoAlpha: 1, y: 0, scale: 1, duration: .72, clearProps: 'transform' }, '-=.68');
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.to('.auth-ambient-orb', { x: 18, y: -12, duration: 8, ease: 'sine.inOut', yoyo: true, repeat: -1, stagger: 2 });
+    }
   },
 
   _track(tween) {
@@ -526,6 +545,30 @@ const AppController = {
     _$('signup-form').classList.toggle('active');
     _$('login-error').textContent = '';
     _$('signup-error').textContent = '';
+    const isSignup = _$('signup-form').classList.contains('active');
+    const heading = document.querySelector('.auth-card-heading');
+    const sub = document.querySelector('.auth-card-sub');
+    if (heading) heading.textContent = isSignup ? 'Create your account' : 'Welcome back';
+    if (sub) sub.textContent = isSignup ? 'A few details to make this space yours.' : 'Sign in to pick up where you left off.';
+    const focusTarget = isSignup ? _$('signup-name') : _$('login-username');
+    if (focusTarget) focusTarget.focus();
+    if (window.gsap && !MotionSystem.reduced()) {
+      const form = isSignup ? '#signup-form' : '#login-form';
+      window.gsap.fromTo(`${form} .field-group, ${form} .btn-full, ${form} .auth-footer-links`,
+        { autoAlpha: 0, y: 9 },
+        { autoAlpha: 1, y: 0, duration: .3, stagger: .065, ease: 'power2.out', clearProps: 'all' });
+      window.gsap.fromTo('.auth-card-heading', { y: 5, autoAlpha: .55 }, { y: 0, autoAlpha: 1, duration: .24, ease: 'power2.out', clearProps: 'all' });
+    }
+  },
+
+  togglePassword(id, button) {
+    const input = _$(id);
+    if (!input) return;
+    const visible = input.type === 'password';
+    input.type = visible ? 'text' : 'password';
+    button.textContent = visible ? 'Hide' : 'Show';
+    button.setAttribute('aria-label', `${visible ? 'Hide' : 'Show'} password`);
+    button.setAttribute('aria-pressed', String(visible));
   },
 
   startJourney() {
@@ -2564,6 +2607,15 @@ function init() {
   }
 
   /* Restore session */
+  document.querySelectorAll('#login-form input, #signup-form input').forEach(input => {
+    input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      if (_$('signup-form').classList.contains('active')) AppController.signup();
+      else AppController.login();
+    });
+  });
+
   const saved=Storage.readJSON(KEYS.CURRENT,null);
   if(saved){
     if(typeof saved.username==='string'&&typeof saved.name==='string'&&saved.name.trim()) { _currentUser=saved; AppController._launch(); }

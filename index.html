@@ -6,7 +6,7 @@
   <title>WALL·E — Your Mental Wellness Companion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
@@ -36,19 +36,25 @@
           <span class="auth-brand-sprout" aria-hidden="true">🌱</span>
           <span class="auth-brand-name">WALL·E</span>
         </div>
-        <p class="auth-brand-tagline">Your Mental Wellness Companion</p>
-        <h1 class="auth-hero-statement">A calmer mind.<br/>A kinder you.</h1>
+        <p class="auth-brand-tagline">A private space for your wellbeing</p>
+        <p class="auth-eyebrow"><span class="auth-status-dot"></span> A LITTLE SPACE TO RESET</p>
+        <h1 class="auth-hero-statement">Make space<br/>for how you <span class="auth-highlight">feel.</span></h1>
         <p class="auth-hero-description">
-          WALL·E is your safe space to pause, reflect, and grow. Track your mood, build healthy habits, and find peace in the little things.
+          Check in with yourself, build steady habits, and make time for small moments of calm. Your progress stays on this device.
         </p>
+        <div class="auth-feature-list" aria-label="What you can do with WALL·E">
+          <span><i class="auth-feature-dot mood-dot"></i>Mood check-ins</span>
+          <span><i class="auth-feature-dot habit-dot"></i>Gentle habits</span>
+          <span><i class="auth-feature-dot journal-dot"></i>Private journal</span>
+        </div>
         <div class="auth-hero-action-row">
-          <button class="btn-primary btn-journey" onclick="AppController.startJourney()">
-            Start Your Journey →
+          <button class="btn-primary btn-journey" onclick="document.getElementById('login-username').focus()">
+            Sign in to continue <span aria-hidden="true">→</span>
           </button>
         </div>
         <div class="auth-trust-badge">
-          <span class="auth-trust-icon">🛡️</span>
-          <span>No data leaves your device · Pure local privacy</span>
+          <span class="auth-trust-icon" aria-hidden="true">⌑</span>
+          <span>Your reflections stay private on this device</span>
         </div>
       </div>
 
@@ -74,8 +80,8 @@
               </svg>
             </div>
             <div class="auth-mascot-text">
-              <h2 class="auth-card-heading">Welcome Back!</h2>
-              <p class="auth-card-sub">Sign in to continue your journey.</p>
+              <h2 class="auth-card-heading">Welcome back</h2>
+              <p class="auth-card-sub">Sign in to pick up where you left off.</p>
             </div>
           </div>
 
@@ -83,17 +89,17 @@
           <div id="login-form" class="auth-form active">
             <div class="field-group">
               <label class="field-label" for="login-username">Username</label>
-              <input class="field-input" type="text" id="login-username" placeholder="e.g. demo" autocomplete="off" />
+              <input class="field-input" type="text" id="login-username" placeholder="Your username" autocomplete="username" required />
             </div>
             <div class="field-group">
               <label class="field-label" for="login-password">Password</label>
-              <input class="field-input" type="password" id="login-password" placeholder="••••••••" />
+              <div class="auth-password-wrap"><input class="field-input" type="password" id="login-password" placeholder="Your password" autocomplete="current-password" required /><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false" onclick="AppController.togglePassword('login-password', this)">Show</button></div>
             </div>
-            <p id="login-error" class="form-error"></p>
-            <button class="btn-primary btn-full" onclick="AppController.login()">Sign In →</button>
+            <p id="login-error" class="form-error" role="alert" aria-live="polite"></p>
+            <button class="btn-primary btn-full" type="button" onclick="AppController.login()">Sign in <span aria-hidden="true">→</span></button>
             <div class="auth-footer-links">
-              <p class="auth-hint">Demo account: <strong>demo</strong> / <strong>demo1234</strong></p>
-              <p class="auth-switch">Don't have an account? <a onclick="AppController.toggleAuth()">Create Account</a></p>
+              <p class="auth-hint">New to WALL·E? Create a free account to get started.</p>
+              <p class="auth-switch">Don't have an account? <a href="#signup" onclick="event.preventDefault(); AppController.toggleAuth()">Create account</a></p>
             </div>
           </div>
 
@@ -101,20 +107,20 @@
           <div id="signup-form" class="auth-form">
             <div class="field-group">
               <label class="field-label" for="signup-name">Full Name</label>
-              <input class="field-input" type="text" id="signup-name" placeholder="Your full name" autocomplete="off" />
+              <input class="field-input" type="text" id="signup-name" placeholder="Your name" autocomplete="name" required />
             </div>
             <div class="field-group">
               <label class="field-label" for="signup-username">Username</label>
-              <input class="field-input" type="text" id="signup-username" placeholder="Choose a username" autocomplete="off" />
+              <input class="field-input" type="text" id="signup-username" placeholder="Choose a username" autocomplete="username" required />
             </div>
             <div class="field-group">
               <label class="field-label" for="signup-password">Password</label>
-              <input class="field-input" type="password" id="signup-password" placeholder="Minimum 4 characters" />
+              <div class="auth-password-wrap"><input class="field-input" type="password" id="signup-password" placeholder="At least 4 characters" autocomplete="new-password" required /><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false" onclick="AppController.togglePassword('signup-password', this)">Show</button></div>
             </div>
-            <p id="signup-error" class="form-error"></p>
-            <button class="btn-primary btn-full" onclick="AppController.signup()">Get Started →</button>
+            <p id="signup-error" class="form-error" role="alert" aria-live="polite"></p>
+            <button class="btn-primary btn-full" type="button" onclick="AppController.signup()">Create account <span aria-hidden="true">→</span></button>
             <div class="auth-footer-links">
-              <p class="auth-switch">Already have an account? <a onclick="AppController.toggleAuth()">Sign In</a></p>
+              <p class="auth-switch">Already have an account? <a href="#login" onclick="event.preventDefault(); AppController.toggleAuth()">Sign in</a></p>
             </div>
           </div>
         </div>
