@@ -10,7 +10,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=login-refresh-2026-10-11-2" />
+  <link rel="stylesheet" href="style.css?v=login-refresh-2026-10-11-3" />
 </head>
 <body>
 
@@ -33,25 +33,13 @@
       <!-- Left: Art-Directed Brand Manifesto -->
       <div class="auth-brand-hero">
         <div class="auth-brand-logo-row">
-          <span class="auth-brand-symbol" aria-hidden="true">✦</span>
+          <span class="auth-brand-symbol" aria-hidden="true">
+            <svg viewBox="0 0 28 28" focusable="false"><path d="M14 2.8c1.5 6.1 3.1 7.7 9.2 9.2-6.1 1.5-7.7 3.1-9.2 9.2-1.5-6.1-3.1-7.7-9.2-9.2 6.1-1.5 7.7-3.1 9.2-9.2Z"/><circle cx="23.3" cy="4.6" r="1.15"/></svg>
+          </span>
           <span class="auth-brand-name">WALL·E</span>
         </div>
-        <p class="auth-brand-tagline">A private space for your wellbeing</p>
-        <p class="auth-eyebrow"><span class="auth-status-dot"></span> A LITTLE SPACE TO RESET</p>
-        <h1 class="auth-hero-statement">Make space<br/>for how you <span class="auth-highlight">feel.</span></h1>
-        <p class="auth-hero-description">
-          Check in with yourself, build steady habits, and make time for small moments of calm. Your progress stays on this device.
-        </p>
-        <div class="auth-feature-list" aria-label="What you can do with WALL·E">
-          <span><i class="auth-feature-dot mood-dot"></i>Mood check-ins</span>
-          <span><i class="auth-feature-dot habit-dot"></i>Gentle habits</span>
-          <span><i class="auth-feature-dot journal-dot"></i>Private journal</span>
-        </div>
-        <div class="auth-hero-action-row">
-          <button class="btn-primary btn-journey" onclick="document.getElementById('login-username').focus()">
-            Sign in to continue <span aria-hidden="true">→</span>
-          </button>
-        </div>
+        <h1 class="auth-hero-statement">A calmer space<br/>to <span class="auth-highlight">check in.</span></h1>
+        <p class="auth-hero-description">A little room to reflect, at your own pace.</p>
         <div class="auth-trust-badge">
           <span class="auth-trust-icon" aria-hidden="true">⌑</span>
           <span>Your reflections stay private on this device</span>
@@ -67,7 +55,7 @@
               <svg viewBox="0 0 160 112" class="auth-mascot-svg" role="img" aria-label="WALL·E beside a softly glowing star">
                 <defs>
                   <linearGradient id="auth-bot-shell" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#d6bc78"/><stop offset="1" stop-color="#9f8654"/>
+                    <stop offset="0" stop-color="#aec8cc"/><stop offset="1" stop-color="#708c98"/>
                   </linearGradient>
                   <linearGradient id="auth-bot-metal" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="#52657a"/><stop offset="1" stop-color="#253448"/>
@@ -87,7 +75,7 @@
                   <!-- friendly binocular head -->
                   <path d="M54 17 49 9m5 8 9-8" fill="none" stroke="#8797a7" stroke-width="3" stroke-linecap="round"/>
                   <circle cx="49" cy="8" r="2" fill="#86d8bb"/><circle cx="63" cy="8" r="2" fill="#86d8bb"/>
-                  <rect x="37" y="18" width="50" height="38" rx="11" fill="url(#auth-bot-shell)" stroke="#e2d2a5" stroke-width="1.5"/>
+                  <rect x="37" y="18" width="50" height="38" rx="11" fill="url(#auth-bot-shell)" stroke="#c5d2d7" stroke-width="1.5"/>
                   <rect x="43" y="23" width="18" height="25" rx="8" fill="#243449" stroke="#8392a2" stroke-width="2"/>
                   <rect x="64" y="23" width="18" height="25" rx="8" fill="#243449" stroke="#8392a2" stroke-width="2"/>
                   <ellipse cx="52" cy="35" rx="6.7" ry="9" fill="url(#auth-bot-lens)"/>
@@ -95,7 +83,7 @@
                   <circle cx="50" cy="31" r="2" fill="#f3fffb" opacity=".9"/><circle cx="71" cy="31" r="2" fill="#f3fffb" opacity=".9"/>
                   <rect x="61" y="31" width="3" height="7" rx="1.5" fill="#52657a"/>
                   <!-- compact body and tank treads -->
-                  <path d="M46 57h35l8 27H39z" fill="url(#auth-bot-shell)" stroke="#d4c18f" stroke-width="1.5"/>
+                  <path d="M46 57h35l8 27H39z" fill="url(#auth-bot-shell)" stroke="#a8bdc4" stroke-width="1.5"/>
                   <rect x="47" y="62" width="32" height="17" rx="4" fill="url(#auth-bot-metal)"/>
                   <text x="63" y="73" text-anchor="middle" fill="#d9e2eb" font-size="5.5" font-family="Inter, sans-serif" font-weight="700" letter-spacing=".7">WALL·E</text>
                   <path d="M39 82h48a7 7 0 0 1 0 14H39a7 7 0 0 1 0-14Z" fill="#1d2938" stroke="#667789" stroke-width="1.5"/>
@@ -314,30 +302,30 @@
             </button>
           </div>
 
-          <!-- Central Character Stage: Master Vector SVG of WALL-E & Boot Plant -->
+          <!-- Central Character Stage: WALL·E beneath a quiet guiding star -->
           <div class="sanctuary-character-stage">
             <div class="sanctuary-walle" id="sanctuary-walle">
-              <svg class="sanctuary-walle-art" viewBox="0 0 380 340" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WALL-E beside his green seedling in a boot watching the sunset">
+              <svg class="sanctuary-walle-art" viewBox="0 0 380 340" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WALL·E beneath a softly glowing guiding star in a quiet night sky">
                 <defs>
                   <linearGradient id="w-sky-haze" x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stop-color="rgba(245, 158, 11, 0.32)"/>
-                    <stop offset="50%" stop-color="rgba(217, 119, 6, 0.12)"/>
+                    <stop offset="0%" stop-color="rgba(115, 200, 193, 0.22)"/>
+                    <stop offset="50%" stop-color="rgba(84, 121, 192, 0.12)"/>
                     <stop offset="100%" stop-color="transparent"/>
                   </linearGradient>
                   <radialGradient id="w-sun-glow" cx="50%" cy="80%" r="60%">
-                    <stop offset="0%" stop-color="rgba(251, 191, 36, 0.35)"/>
-                    <stop offset="45%" stop-color="rgba(245, 158, 11, 0.16)"/>
+                    <stop offset="0%" stop-color="rgba(166, 221, 217, 0.2)"/>
+                    <stop offset="45%" stop-color="rgba(115, 200, 193, 0.12)"/>
                     <stop offset="100%" stop-color="transparent"/>
                   </radialGradient>
-                  <linearGradient id="w-yellow-body" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#FBBF24"/>
-                    <stop offset="25%" stop-color="#E5A93C"/>
-                    <stop offset="70%" stop-color="#D97706"/>
-                    <stop offset="100%" stop-color="#92400E"/>
+                  <linearGradient id="w-body-metal" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#C8DDE0"/>
+                    <stop offset="25%" stop-color="#9AB8C0"/>
+                    <stop offset="70%" stop-color="#638594"/>
+                    <stop offset="100%" stop-color="#3A5668"/>
                   </linearGradient>
-                  <linearGradient id="w-yellow-highlight" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#FDE68A"/>
-                    <stop offset="100%" stop-color="#D97706"/>
+                  <linearGradient id="w-body-highlight" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#DDF2F0"/>
+                    <stop offset="100%" stop-color="#638594"/>
                   </linearGradient>
                   <linearGradient id="w-dark-metal" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#475569"/>
@@ -350,10 +338,10 @@
                     <stop offset="100%" stop-color="#020617"/>
                   </linearGradient>
                   <radialGradient id="w-lens-core" cx="45%" cy="45%" r="55%">
-                    <stop offset="0%" stop-color="#FEF08A"/>
-                    <stop offset="35%" stop-color="#F59E0B"/>
-                    <stop offset="75%" stop-color="#B45309"/>
-                    <stop offset="100%" stop-color="#451A03"/>
+                    <stop offset="0%" stop-color="#E4FAFF"/>
+                    <stop offset="35%" stop-color="#73C8C1"/>
+                    <stop offset="75%" stop-color="#317596"/>
+                    <stop offset="100%" stop-color="#122A40"/>
                   </radialGradient>
                   <radialGradient id="w-lens-glass" cx="30%" cy="30%" r="65%">
                     <stop offset="0%" stop-color="rgba(255,255,255,0.75)"/>
@@ -361,16 +349,6 @@
                     <stop offset="70%" stop-color="transparent"/>
                     <stop offset="100%" stop-color="rgba(15, 23, 42, 0.85)"/>
                   </radialGradient>
-                  <linearGradient id="w-boot-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#6B3410"/>
-                    <stop offset="45%" stop-color="#451A03"/>
-                    <stop offset="100%" stop-color="#1E0A00"/>
-                  </linearGradient>
-                  <linearGradient id="w-leaf-grad" x1="0%" y1="100%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#059669"/>
-                    <stop offset="60%" stop-color="#10B981"/>
-                    <stop offset="100%" stop-color="#6EE7B7"/>
-                  </linearGradient>
                   <filter id="w-glow" x="-20%" y="-20%" width="140%" height="140%">
                     <feGaussianBlur stdDeviation="3.5" result="blur"/>
                     <feComposite in="SourceGraphic" in2="blur" operator="over"/>
@@ -380,7 +358,7 @@
                   </filter>
                 </defs>
 
-                <!-- Horizon Atmosphere Aura Behind WALL-E -->
+                <!-- Cool twilight atmosphere behind WALL·E -->
                 <rect x="0" y="150" width="380" height="190" fill="url(#w-sky-haze)"/>
                 <ellipse cx="190" cy="265" rx="160" ry="80" fill="url(#w-sun-glow)"/>
 
@@ -420,24 +398,24 @@
 
                   <!-- Cubical Torso Chassis -->
                   <g class="walle-torso">
-                    <rect x="116" y="196" width="118" height="102" rx="7" fill="url(#w-yellow-body)" stroke="#78350F" stroke-width="2"/>
-                    <path d="M 120 198 L 230 198 L 226 204 L 124 204 Z" fill="url(#w-yellow-highlight)" opacity="0.85"/>
-                    <path d="M 122 248 L 228 248" stroke="#78350F" stroke-width="2"/>
-                    <path d="M 175 248 L 175 294" stroke="#78350F" stroke-width="1.5"/>
-                    <circle cx="123" cy="204" r="1.8" fill="#451A03"/>
-                    <circle cx="227" cy="204" r="1.8" fill="#451A03"/>
-                    <circle cx="123" cy="242" r="1.8" fill="#451A03"/>
-                    <circle cx="227" cy="242" r="1.8" fill="#451A03"/>
-                    <circle cx="123" cy="290" r="1.8" fill="#451A03"/>
-                    <circle cx="227" cy="290" r="1.8" fill="#451A03"/>
+                    <rect x="116" y="196" width="118" height="102" rx="7" fill="url(#w-body-metal)" stroke="#385567" stroke-width="2"/>
+                    <path d="M 120 198 L 230 198 L 226 204 L 124 204 Z" fill="url(#w-body-highlight)" opacity="0.85"/>
+                    <path d="M 122 248 L 228 248" stroke="#385567" stroke-width="2"/>
+                    <path d="M 175 248 L 175 294" stroke="#385567" stroke-width="1.5"/>
+                    <circle cx="123" cy="204" r="1.8" fill="#243D4F"/>
+                    <circle cx="227" cy="204" r="1.8" fill="#243D4F"/>
+                    <circle cx="123" cy="242" r="1.8" fill="#243D4F"/>
+                    <circle cx="227" cy="242" r="1.8" fill="#243D4F"/>
+                    <circle cx="123" cy="290" r="1.8" fill="#243D4F"/>
+                    <circle cx="227" cy="290" r="1.8" fill="#243D4F"/>
 
                     <!-- Solar Charge Gauge -->
                     <g class="walle-solar-gauge">
                       <rect x="128" y="212" width="48" height="13" rx="2.5" fill="#0B0F1A" stroke="#334155" stroke-width="1"/>
-                      <rect x="131" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
-                      <rect x="140" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
-                      <rect x="149" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
-                      <rect x="158" y="214.5" width="7.5" height="8" rx="1" fill="#F59E0B" filter="url(#w-glow)"/>
+                      <rect x="131" y="214.5" width="7.5" height="8" rx="1" fill="#73C8C1" filter="url(#w-glow)"/>
+                      <rect x="140" y="214.5" width="7.5" height="8" rx="1" fill="#73C8C1" filter="url(#w-glow)"/>
+                      <rect x="149" y="214.5" width="7.5" height="8" rx="1" fill="#73C8C1" filter="url(#w-glow)"/>
+                      <rect x="158" y="214.5" width="7.5" height="8" rx="1" fill="#73C8C1" filter="url(#w-glow)"/>
                       <rect x="167" y="214.5" width="7" height="8" rx="1" fill="#451A03"/>
                       <text x="129" y="233" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="6.5" font-weight="700" fill="#94A3B8" letter-spacing="0.5">SOLAR</text>
                     </g>
@@ -479,12 +457,12 @@
 
                     <!-- Left Eye Binocular -->
                     <g class="walle-left-eye" transform="rotate(-3 138 122)">
-                      <path d="M 106 100 Q 140 92 168 98 L 165 142 Q 138 148 106 142 Z" fill="url(#w-yellow-body)" stroke="#78350F" stroke-width="1.8"/>
-                      <path d="M 108 102 Q 138 95 166 100" stroke="#FDE68A" stroke-width="2.5" fill="none" opacity="0.8"/>
+                      <path d="M 106 100 Q 140 92 168 98 L 165 142 Q 138 148 106 142 Z" fill="url(#w-body-metal)" stroke="#385567" stroke-width="1.8"/>
+                      <path d="M 108 102 Q 138 95 166 100" stroke="#DDF2F0" stroke-width="2.5" fill="none" opacity="0.8"/>
                       <ellipse cx="137" cy="123" rx="24" ry="18" fill="#0F172A" stroke="#475569" stroke-width="2"/>
                       <ellipse cx="137" cy="123" rx="19" ry="14" fill="url(#w-lens-core)"/>
-                      <ellipse cx="137" cy="123" rx="14" ry="10" fill="none" stroke="rgba(251, 191, 36, 0.4)" stroke-width="1"/>
-                      <ellipse cx="137" cy="123" rx="8" ry="6" fill="#1E0A00" opacity="0.65"/>
+                      <ellipse cx="137" cy="123" rx="14" ry="10" fill="none" stroke="rgba(166, 221, 217, 0.45)" stroke-width="1"/>
+                      <ellipse cx="137" cy="123" rx="8" ry="6" fill="#122A40" opacity="0.65"/>
                       <ellipse cx="137" cy="123" rx="19" ry="14" fill="url(#w-lens-glass)"/>
                       <circle cx="130" cy="116" r="3.5" fill="#FFFFFF" opacity="0.95"/>
                       <circle cx="135" cy="120" r="1.5" fill="#FFFFFF" opacity="0.7"/>
@@ -493,12 +471,12 @@
 
                     <!-- Right Eye Binocular -->
                     <g class="walle-right-eye" transform="rotate(3 212 122)">
-                      <path d="M 182 98 Q 210 92 244 100 L 244 142 Q 212 148 185 142 Z" fill="url(#w-yellow-body)" stroke="#78350F" stroke-width="1.8"/>
-                      <path d="M 184 100 Q 212 95 242 102" stroke="#FDE68A" stroke-width="2.5" fill="none" opacity="0.8"/>
+                      <path d="M 182 98 Q 210 92 244 100 L 244 142 Q 212 148 185 142 Z" fill="url(#w-body-metal)" stroke="#385567" stroke-width="1.8"/>
+                      <path d="M 184 100 Q 212 95 242 102" stroke="#DDF2F0" stroke-width="2.5" fill="none" opacity="0.8"/>
                       <ellipse cx="213" cy="123" rx="24" ry="18" fill="#0F172A" stroke="#475569" stroke-width="2"/>
                       <ellipse cx="213" cy="123" rx="19" ry="14" fill="url(#w-lens-core)"/>
-                      <ellipse cx="213" cy="123" rx="14" ry="10" fill="none" stroke="rgba(251, 191, 36, 0.4)" stroke-width="1"/>
-                      <ellipse cx="213" cy="123" rx="8" ry="6" fill="#1E0A00" opacity="0.65"/>
+                      <ellipse cx="213" cy="123" rx="14" ry="10" fill="none" stroke="rgba(166, 221, 217, 0.45)" stroke-width="1"/>
+                      <ellipse cx="213" cy="123" rx="8" ry="6" fill="#122A40" opacity="0.65"/>
                       <ellipse cx="213" cy="123" rx="19" ry="14" fill="url(#w-lens-glass)"/>
                       <circle cx="206" cy="116" r="3.5" fill="#FFFFFF" opacity="0.95"/>
                       <circle cx="211" cy="120" r="1.5" fill="#FFFFFF" opacity="0.7"/>
@@ -507,18 +485,13 @@
                   </g>
                 </g>
 
-                <!-- THE OLD BOOT & LIVING SPROUT -->
-                <g class="walle-boot-and-plant" id="boot-plant-group">
-                  <path d="M 285 278 L 298 274 L 306 295 L 328 298 Q 334 306 330 314 L 280 316 Q 275 304 285 278 Z" fill="url(#w-boot-grad)" stroke="#290F03" stroke-width="1.5"/>
-                  <path d="M 278 316 L 332 314 L 331 319 L 278 321 Z" fill="#0F172A"/>
-                  <ellipse cx="292" cy="276" rx="8" ry="4" fill="#1A0A02"/>
-                  <circle cx="295" cy="245" r="24" fill="rgba(16, 185, 129, 0.16)" filter="url(#w-glow)"/>
-                  <path d="M 292 274 Q 290 256 294 242" stroke="url(#w-leaf-grad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                  <path d="M 292 254 Q 278 248 276 240 Q 284 238 293 250 Z" fill="url(#w-leaf-grad)" stroke="#059669" stroke-width="0.8"/>
-                  <path d="M 292 254 Q 284 246 278 241" stroke="#A7F3D0" stroke-width="0.7" fill="none" opacity="0.8"/>
-                  <path d="M 294 244 Q 308 234 316 230 Q 312 242 295 246 Z" fill="url(#w-leaf-grad)" stroke="#059669" stroke-width="0.8"/>
-                  <path d="M 294 244 Q 306 237 314 232" stroke="#A7F3D0" stroke-width="0.7" fill="none" opacity="0.8"/>
-                  <circle cx="315" cy="231" r="1.5" fill="#FFFFFF" filter="url(#w-glow)"/>
+                <!-- Guiding star and orbit: a symbol of small moments adding up -->
+                <g class="walle-guiding-star" id="walle-guiding-star">
+                  <ellipse cx="302" cy="267" rx="35" ry="12" transform="rotate(-22 302 267)" fill="none" stroke="#73C8C1" stroke-width="1.1" opacity="0.48"/>
+                  <circle cx="302" cy="267" r="24" fill="#73C8C1" opacity="0.1" filter="url(#w-glow)"/>
+                  <path d="M302 246c2.8 11.4 5.6 16.2 17 20.8-11.4 2.8-14.2 7.6-17 19.2-2.8-11.6-5.6-16.4-17-19.2 11.4-4.6 14.2-9.4 17-20.8Z" fill="#B8E8E7"/>
+                  <circle cx="331" cy="250" r="2" fill="#A9C6F4"/>
+                  <circle cx="276" cy="291" r="1.6" fill="#A9C6F4" opacity="0.8"/>
                 </g>
               </svg>
             </div>
@@ -567,7 +540,7 @@
           <div class="glance-grid">
             <!-- 1. Journal Capsule -->
             <a href="#section-journal" class="glance-capsule glass-panel" onclick="event.preventDefault(); AppController.navigate('journal')">
-              <div class="glance-icon-badge badge-amber">
+              <div class="glance-icon-badge badge-teal">
                 <span>📓</span>
               </div>
               <div class="glance-body">
@@ -665,7 +638,7 @@
               </div>
               <div class="ws-bar-row">
                 <span class="ws-bar-lbl">📓 Journal</span>
-                <div class="ws-bar-track"><div class="ws-bar-fill c-amber" id="wb-journal"></div></div>
+                <div class="ws-bar-track"><div class="ws-bar-fill c-teal" id="wb-journal"></div></div>
                 <span class="ws-bar-val" id="wb-journal-val">—%</span>
               </div>
               <div class="ws-bar-row">
@@ -817,11 +790,11 @@
               <div class="avatar-glow" id="avatar-glow"></div>
               <div class="avatar-face" id="avatar-face">
                 <svg viewBox="0 0 54 44" width="46" height="38" aria-hidden="true">
-                  <ellipse cx="18" cy="22" rx="13" ry="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.6"/>
-                  <ellipse cx="18" cy="22" rx="8" ry="6" fill="#F59E0B"/>
+                  <ellipse cx="18" cy="22" rx="13" ry="10" fill="#1E293B" stroke="#73C8C1" stroke-width="1.6"/>
+                  <ellipse cx="18" cy="22" rx="8" ry="6" fill="#73C8C1"/>
                   <circle cx="16" cy="20" r="2" fill="#FFFFFF"/>
-                  <ellipse cx="36" cy="22" rx="13" ry="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.6"/>
-                  <ellipse cx="36" cy="22" rx="8" ry="6" fill="#F59E0B"/>
+                  <ellipse cx="36" cy="22" rx="13" ry="10" fill="#1E293B" stroke="#73C8C1" stroke-width="1.6"/>
+                  <ellipse cx="36" cy="22" rx="8" ry="6" fill="#73C8C1"/>
                   <circle cx="34" cy="20" r="2" fill="#FFFFFF"/>
                   <rect x="25" y="20" width="4" height="4" fill="#475569" rx="1"/>
                 </svg>

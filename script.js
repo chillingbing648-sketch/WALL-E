@@ -194,12 +194,12 @@ const MotionSystem = {
     if (!screen || screen.style.display === 'none') return;
     this.stopAuthMotion();
     const gsap = window.gsap;
-    gsap.set('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge', { autoAlpha: 0, y: 16 });
-    gsap.set('.auth-brand-logo-row, .auth-brand-tagline', { autoAlpha: 0, y: 10 });
+    gsap.set('.auth-hero-statement, .auth-hero-description, .auth-trust-badge', { autoAlpha: 0, y: 16 });
+    gsap.set('.auth-brand-logo-row', { autoAlpha: 0, y: 10 });
     gsap.set('.auth-card', { autoAlpha: 0, y: 22, scale: .985 });
     this._authTimeline = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      .to('.auth-brand-logo-row, .auth-brand-tagline', { autoAlpha: 1, y: 0, duration: .55, stagger: .1 })
-      .to('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge', { autoAlpha: 1, y: 0, duration: .62, stagger: .1 }, '-=.32')
+      .to('.auth-brand-logo-row', { autoAlpha: 1, y: 0, duration: .55 })
+      .to('.auth-hero-statement, .auth-hero-description, .auth-trust-badge', { autoAlpha: 1, y: 0, duration: .62, stagger: .1 }, '-=.32')
       .to('.auth-card', { autoAlpha: 1, y: 0, scale: 1, duration: .72, clearProps: 'transform' }, '-=.68');
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this._authLoops = [
@@ -215,7 +215,7 @@ const MotionSystem = {
     this._authTimeline = null;
     this._authLoops.forEach(tween => tween.kill());
     this._authLoops = [];
-    window.gsap?.set('.auth-eyebrow, .auth-hero-statement, .auth-hero-description, .auth-feature-list, .auth-trust-badge, .auth-brand-logo-row, .auth-brand-tagline, .auth-card, .auth-ambient-orb, .auth-bot-art, .auth-guiding-star', { clearProps: 'opacity,visibility,transform' });
+    window.gsap?.set('.auth-hero-statement, .auth-hero-description, .auth-trust-badge, .auth-brand-logo-row, .auth-card, .auth-ambient-orb, .auth-bot-art, .auth-guiding-star', { clearProps: 'opacity,visibility,transform' });
   },
 
   _track(tween) {
@@ -929,7 +929,7 @@ const Analytics = {
       const aura = _$('sanctuary-aura');
       if (aura) {
         const auraColors = {
-          Happy: 'radial-gradient(circle, rgba(245, 158, 11, 0.35), transparent 70%)',
+          Happy: 'radial-gradient(circle, rgba(115, 200, 193, 0.35), transparent 70%)',
           Calm: 'radial-gradient(circle, rgba(56, 189, 248, 0.3), transparent 70%)',
           Neutral: 'radial-gradient(circle, rgba(148, 163, 184, 0.25), transparent 70%)',
           Stressed: 'radial-gradient(circle, rgba(129, 140, 248, 0.3), transparent 70%)',
@@ -942,7 +942,7 @@ const Analytics = {
       _setText('sanctuary-mood-title', 'Unchecked');
       _setText('sanctuary-mood-energy', 'Ready for today');
       const aura = _$('sanctuary-aura');
-      if (aura) aura.style.background = 'radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 70%)';
+      if (aura) aura.style.background = 'radial-gradient(circle, rgba(123, 205, 177, 0.25), transparent 70%)';
     }
 
     /* Dashboard greeting & topbar */
@@ -996,7 +996,7 @@ const Analytics = {
   scoreLabel(score) {
     if(score>=80) return { label:'Excellent',      emoji:'🌟', color:'var(--c-emerald)' };
     if(score>=60) return { label:'Balanced',        emoji:'🌤', color:'var(--c-sky)'    };
-    if(score>=40) return { label:'Needs Attention', emoji:'🌥', color:'var(--c-amber)'  };
+    if(score>=40) return { label:'Needs Attention', emoji:'🌥', color:'var(--c-teal)'  };
     return                { label:'Critical Care',  emoji:'⚠',  color:'var(--c-rose)'  };
   },
 
@@ -1066,7 +1066,7 @@ const Analytics = {
     if(valid.length>=2){
       const diff=valid[valid.length-1]-valid[0];
       const b=_$('mood-trend-badge');
-      if(b){ b.textContent=diff>0?'↑ Improving':diff<0?'↓ Declining':'→ Stable'; b.style.color=diff>0?_colorToken('--c-emerald','#10b981'):diff<0?_colorToken('--c-rose','#f43f5e'):chartText; b.style.borderColor=diff>0?_withAlpha(_colorToken('--c-emerald','#10b981'),'66'):diff<0?_withAlpha(_colorToken('--c-rose','#f43f5e'),'66'):_colorToken('--border','rgba(148,163,184,.15)'); }
+      if(b){ b.textContent=diff>0?'↑ Improving':diff<0?'↓ Declining':'→ Stable'; b.style.color=diff>0?_colorToken('--c-emerald','#7bcdb1'):diff<0?_colorToken('--c-rose','#f43f5e'):chartText; b.style.borderColor=diff>0?_withAlpha(_colorToken('--c-emerald','#7bcdb1'),'66'):diff<0?_withAlpha(_colorToken('--c-rose','#f43f5e'),'66'):_colorToken('--border','rgba(148,163,184,.15)'); }
     }
     _chartMoodTrend=new Chart(canvas,{
       type:'line',
@@ -1078,7 +1078,7 @@ const Analytics = {
   buildMoodDist() {
     const canvas=_$('moodDistChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartMoodDist) _chartMoodDist.destroy();
-    const colors=['--mood-happy','--mood-calm','--mood-neutral','--mood-stressed','--mood-sad'].map((token,index)=>_colorToken(token,['#f59e0b','#0ea5e9','#94a3b8','#818cf8','#6366f1'][index]));
+    const colors=['--mood-happy','--mood-calm','--mood-neutral','--mood-stressed','--mood-sad'].map((token,index)=>_colorToken(token,['#9b9be6','#0ea5e9','#94a3b8','#818cf8','#6366f1'][index]));
     const counts={Happy:0,Calm:0,Neutral:0,Stressed:0,Sad:0};
     MoodSystem.get().forEach(m=>{if(counts[m.mood]!==undefined)counts[m.mood]++;});
     _chartMoodDist=new Chart(canvas,{
@@ -1091,7 +1091,7 @@ const Analytics = {
   buildHabitChart() {
     const canvas=_$('habitChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartHabit) _chartHabit.destroy();
-    const success=_colorToken('--c-emerald','#10b981'), warning=_colorToken('--c-amber','#f59e0b'), info=_colorToken('--c-sky','#0ea5e9');
+    const success=_colorToken('--c-emerald','#7bcdb1'), warning=_colorToken('--color-warning','#e8a58f'), info=_colorToken('--c-sky','#0ea5e9');
     const chartText=_colorToken('--text-secondary','#94a3b8');
     const habits=HabitSystem.get(), habitLog=HabitSystem.getLog();
     const labels=[], data=[];
@@ -1879,14 +1879,14 @@ const AnalyticsSystem = {
   _buildRptMoodChart(moodCounts) {
     const canvas=_$('reportMoodChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartRptMood) _chartRptMood.destroy();
-    const colors=['--mood-happy','--mood-calm','--mood-neutral','--mood-stressed','--mood-sad'].map((token,index)=>_colorToken(token,['#f59e0b','#0ea5e9','#94a3b8','#818cf8','#6366f1'][index]));
+    const colors=['--mood-happy','--mood-calm','--mood-neutral','--mood-stressed','--mood-sad'].map((token,index)=>_colorToken(token,['#9b9be6','#0ea5e9','#94a3b8','#818cf8','#6366f1'][index]));
     _chartRptMood=new Chart(canvas,{ type:'doughnut', data:{ labels:Object.keys(moodCounts), datasets:[{ data:Object.values(moodCounts), backgroundColor:colors.map(color=>_withAlpha(color,'b8')), borderColor:colors, borderWidth:2,hoverOffset:5 }] }, options:{ responsive:true,maintainAspectRatio:false,cutout:'65%', plugins:{legend:{position:'right',labels:{color:_colorToken('--text-secondary','#94a3b8'),padding:12,font:{family:'Plus Jakarta Sans, system-ui, sans-serif',size:12,weight:500}}}} } });
   },
 
   _buildRptHabitChart(wkTotals, wkPoss) {
     const canvas=_$('reportHabitChart'); if(!canvas||typeof Chart==='undefined') return;
     if(_chartRptHabit) _chartRptHabit.destroy();
-    const success=_colorToken('--c-emerald','#10b981'), warning=_colorToken('--c-amber','#f59e0b'), info=_colorToken('--c-sky','#0ea5e9');
+    const success=_colorToken('--c-emerald','#7bcdb1'), warning=_colorToken('--color-warning','#e8a58f'), info=_colorToken('--c-sky','#0ea5e9');
     const chartText=_colorToken('--text-secondary','#94a3b8');
     const pcts=wkTotals.map((t,i)=>wkPoss[i]?Math.round((t/wkPoss[i])*100):0);
     _chartRptHabit=new Chart(canvas,{ type:'bar', data:{ labels:['Week 1','Week 2','Week 3','Week 4'], datasets:[{ data:pcts, backgroundColor:pcts.map(v=>_withAlpha(v>=80?success:v>=50?info:warning,'a8')), borderColor:pcts.map(v=>v>=80?success:v>=50?info:warning), borderWidth:1,borderRadius:6 }] }, options:{ responsive:true,maintainAspectRatio:false, scales:{ y:{min:0,max:100,ticks:{color:chartText,callback:v=>v+'%'},grid:{color:'rgba(148,163,184,.07)'}}, x:{ticks:{color:chartText},grid:{display:false}} }, plugins:{legend:{display:false}} } });
@@ -2172,7 +2172,7 @@ const MemoryGarden = {
     const typeNames = { win: 'Small Win', gratitude: 'Gratitude', memory: 'Warm Memory', reflection: 'Reflection' };
     const typeColors = {
       win: 'var(--mood-happy)',
-      gratitude: 'var(--accent-amber)',
+      gratitude: 'var(--accent-teal)',
       memory: 'var(--accent-green)',
       reflection: 'var(--accent-violet)'
     };
@@ -2450,7 +2450,7 @@ const MentalWeatherSystem = {
         mood: 'Happy',
         energy: 'Vibrant',
         tension: 'Low',
-        glow: 'radial-gradient(circle, rgba(245, 158, 11, 0.26), transparent 70%)'
+        glow: 'radial-gradient(circle, rgba(115, 200, 193, 0.26), transparent 70%)'
       };
     } else if (avgScore >= 3.6) {
       return {
@@ -2574,8 +2574,8 @@ const ConstellationSystem = {
     if (!stars.length) {
       // Seed default quiet constellation if user is brand new
       svgStars.innerHTML = `
-        <circle cx="120" cy="80" r="3.5" fill="#f59e0b" filter="url(#starGlow)" opacity="0.6"/>
-        <circle cx="230" cy="60" r="4.5" fill="#fbbf24" filter="url(#starGlow)" opacity="0.8"/>
+        <circle cx="120" cy="80" r="3.5" fill="#9b9be6" filter="url(#starGlow)" opacity="0.6"/>
+        <circle cx="230" cy="60" r="4.5" fill="#a6ddd9" filter="url(#starGlow)" opacity="0.8"/>
         <circle cx="340" cy="110" r="3.5" fill="#60a5fa" filter="url(#starGlow)" opacity="0.6"/>
       `;
       svgLines.innerHTML = `
@@ -2599,7 +2599,7 @@ const ConstellationSystem = {
 
     // Render stars
     svgStars.innerHTML = displayStars.map(s => `
-      <circle class="constellation-star" cx="${s.cx}" cy="${s.cy}" r="${s.r}" fill="#fbbf24" filter="url(#starGlow)" onclick="ConstellationSystem.inspectStar(${s.id})"/>
+      <circle class="constellation-star" cx="${s.cx}" cy="${s.cy}" r="${s.r}" fill="#a6ddd9" filter="url(#starGlow)" onclick="ConstellationSystem.inspectStar(${s.id})"/>
     `).join('');
   },
 
