@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="880" viewBox="0 0 1500 880" role="img" aria-labelledby="title desc">
+  <title id="title">WALL·E wellness workspace overview</title>
+  <desc id="desc">A concept illustration of WALL·E's dark, calming wellness dashboard with mood tracking, a seven-day mood chart, a harmony balance score, healthy habits, and a small glowing memory garden.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b0f1a"/><stop offset=".55" stop-color="#10182a"/><stop offset="1" stop-color="#171a32"/></linearGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fbbf24"/><stop offset="1" stop-color="#f59e0b"/></linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#6d5ce8"/><stop offset="1" stop-color="#9a8bff"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#f59e0b" stop-opacity=".22"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0"/></radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="35"/></filter>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#b9c8ff" stroke-opacity=".055" stroke-width="1"/></pattern>
+    <style>
+      .ui{font-family:'Plus Jakarta Sans',Inter,system-ui,sans-serif}
+      .serif{font-family:'Playfair Display',Georgia,serif}
+      .label{font-size:10px;letter-spacing:1.6px;font-weight:700}
+      .copy{fill:#9aa8c4;font-family:'Plus Jakarta Sans',Inter,system-ui,sans-serif}
+      .title{fill:#f4f6fc;font-family:'Plus Jakarta Sans',Inter,system-ui,sans-serif}
+      .panel{fill:#111a2c;fill-opacity:.92;stroke:#dce5ff;stroke-opacity:.095}
+    </style>
+  </defs>
+  <rect width="1500" height="880" rx="28" fill="#080c15"/>
+  <rect x="12" y="12" width="1476" height="856" rx="22" fill="url(#bg)" stroke="#e4e9ff" stroke-opacity=".12"/>
+  <rect x="12" y="12" width="1476" height="856" rx="22" fill="url(#grid)"/>
+  <circle cx="1170" cy="150" r="190" fill="url(#glow)" filter="url(#blur)"/>
+  <circle cx="220" cy="780" r="220" fill="#4f46e5" opacity=".08" filter="url(#blur)"/>
+  <!-- top chrome -->
+  <g transform="translate(42 36)">
+    <rect x="0" y="0" width="38" height="38" rx="12" fill="#f59e0b" fill-opacity=".14" stroke="#fbbf24" stroke-opacity=".35"/>
+    <path d="M19 28V17M19 21C10 21 9 12 9 12C18 11 20 17 19 21ZM19 17C20 8 28 8 29 8C29 16 23 19 19 17Z" fill="none" stroke="#fbbf24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="50" y="17" class="title ui" font-size="15" font-weight="800" letter-spacing="2">WALL·E</text>
+    <text x="50" y="32" class="copy" font-size="9" letter-spacing="1.5">YOUR WELLNESS SPACE</text>
+    <text x="1390" y="16" text-anchor="end" class="copy label">A SMALL SPACE TO RESET</text>
+    <circle cx="1379" cy="30" r="3" fill="#10b981"/><text x="1390" y="34" class="copy" font-size="10" text-anchor="end">LOCAL WORKSPACE</text>
+  </g>
+  <path d="M42 91H1458" stroke="#fff" stroke-opacity=".09"/>
+  <!-- sidebar -->
+  <g transform="translate(34 112)">
+    <rect width="212" height="724" rx="18" class="panel"/>
+    <g transform="translate(18 22)">
+      <circle cx="18" cy="18" r="18" fill="#f59e0b" fill-opacity=".14"/>
+      <circle cx="13" cy="16" r="6" fill="#24334a" stroke="#fbbf24" stroke-width="1.4"/>
+      <circle cx="24" cy="16" r="6" fill="#24334a" stroke="#fbbf24" stroke-width="1.4"/>
+      <circle cx="13" cy="16" r="2.2" fill="#fbbf24"/><circle cx="24" cy="16" r="2.2" fill="#fbbf24"/>
+      <text x="48" y="16" class="title ui" font-size="12" font-weight="700">Your sanctuary</text>
+      <text x="48" y="31" class="copy" font-size="9">One day at a time</text>
+    </g>
+    <g class="ui" font-size="12">
+      <rect x="12" y="86" width="188" height="38" rx="11" fill="#4f46e5" fill-opacity=".18" stroke="#9387ff" stroke-opacity=".25"/>
+      <circle cx="31" cy="105" r="5" fill="#a99cff"/><text x="46" y="109" fill="#f3f2ff" font-weight="600">Home</text>
+      <circle cx="31" cy="151" r="5" fill="#fbbf24" fill-opacity=".8"/><text x="46" y="155" class="copy">Mood tracker</text>
+      <circle cx="31" cy="197" r="5" fill="#9eb7ff" fill-opacity=".8"/><text x="46" y="201" class="copy">Journal</text>
+      <circle cx="31" cy="243" r="5" fill="#6fd7be" fill-opacity=".8"/><text x="46" y="247" class="copy">Habits</text>
+      <circle cx="31" cy="289" r="5" fill="#c0b5ff" fill-opacity=".8"/><text x="46" y="293" class="copy">Mood boost</text>
+      <circle cx="31" cy="335" r="5" fill="#7fdaad" fill-opacity=".8"/><text x="46" y="339" class="copy">Memory garden</text>
+      <circle cx="31" cy="381" r="5" fill="#84c7ff" fill-opacity=".8"/><text x="46" y="385" class="copy">Zen station</text>
+      <circle cx="31" cy="427" r="5" fill="#fbbf24" fill-opacity=".8"/><text x="46" y="431" class="copy">Wellness report</text>
+    </g>
+    <path d="M16 482H196" stroke="#fff" stroke-opacity=".08"/>
+    <text x="18" y="509" class="copy label" font-size="8">YOUR PACE MATTERS</text>
+    <text x="18" y="540" class="serif" fill="#f5d9a4" font-size="17" font-style="italic">Small steps.</text>
+    <text x="18" y="562" class="serif" fill="#f5d9a4" font-size="17" font-style="italic">Real growth.</text>
+    <g transform="translate(18 610)">
+      <circle cx="15" cy="14" r="14" fill="#10b981" fill-opacity=".12"/>
+      <path d="M15 23V13M15 17C8 17 8 10 8 10C14 9 16 13 15 17ZM15 13C15 7 21 6 22 6C22 12 18 15 15 13Z" fill="none" stroke="#6ee7b7" stroke-width="1.4" stroke-linecap="round"/>
+      <text x="39" y="13" class="title ui" font-size="10" font-weight="600">A quiet reminder</text>
+      <text x="39" y="28" class="copy" font-size="9">You can begin again.</text>
+    </g>
+  </g>
+  <!-- main dashboard -->
+  <g transform="translate(270 112)">
+    <text x="0" y="15" class="copy label">MONDAY · YOUR DAILY CHECK-IN</text>
+    <text x="0" y="53" class="title ui" font-size="28" font-weight="700">A calmer mind,</text>
+    <text x="0" y="85" class="serif" font-size="31" font-style="italic" fill="#c4bbff">a kinder you.</text>
+    <text x="0" y="111" class="copy" font-size="12">Notice how you feel. Celebrate what you do. Make room to reset.</text>
+    <!-- mood panel -->
+    <rect x="0" y="137" width="745" height="140" rx="17" class="panel"/>
+    <text x="20" y="164" class="title ui" font-size="13" font-weight="700">How are you feeling?</text>
+    <text x="724" y="164" class="copy" text-anchor="end" font-size="10">CHECK IN WITH YOURSELF</text>
+    <g transform="translate(21 184)">
+      <g>
+        <rect width="128" height="72" rx="12" fill="#f59e0b" fill-opacity=".105" stroke="#fbbf24" stroke-opacity=".5"/>
+        <circle cx="64" cy="26" r="15" fill="#f59e0b" fill-opacity=".2"/><text x="64" y="31" text-anchor="middle" font-size="17">☺</text>
+        <text x="64" y="56" text-anchor="middle" class="title ui" font-size="11" font-weight="600">Happy</text>
+      </g>
+      <g transform="translate(140)">
+        <rect width="128" height="72" rx="12" fill="#10b981" fill-opacity=".06" stroke="#6ee7b7" stroke-opacity=".22"/>
+        <circle cx="64" cy="26" r="15" fill="#10b981" fill-opacity=".15"/><text x="64" y="31" text-anchor="middle" font-size="17">◡</text>
+        <text x="64" y="56" text-anchor="middle" class="title ui" font-size="11">Calm</text>
+      </g>
+      <g transform="translate(280)">
+        <rect width="128" height="72" rx="12" fill="#94a3b8" fill-opacity=".06" stroke="#94a3b8" stroke-opacity=".2"/>
+        <circle cx="64" cy="26" r="15" fill="#94a3b8" fill-opacity=".15"/><text x="64" y="31" text-anchor="middle" font-size="17">—</text>
+        <text x="64" y="56" text-anchor="middle" class="title ui" font-size="11">Neutral</text>
+      </g>
+      <g transform="translate(420)">
+        <rect width="128" height="72" rx="12" fill="#818cf8" fill-opacity=".06" stroke="#818cf8" stroke-opacity=".2"/>
+        <circle cx="64" cy="26" r="15" fill="#818cf8" fill-opacity=".15"/><text x="64" y="31" text-anchor="middle" font-size="17">⌁</text>
+        <text x="64" y="56" text-anchor="middle" class="title ui" font-size="11">Stressed</text>
+      </g>
+      <g transform="translate(560)">
+        <rect width="128" height="72" rx="12" fill="#a5b4fc" fill-opacity=".06" stroke="#a5b4fc" stroke-opacity=".2"/>
+        <circle cx="64" cy="26" r="15" fill="#a5b4fc" fill-opacity=".15"/><text x="64" y="31" text-anchor="middle" font-size="17">☹</text>
+        <text x="64" y="56" text-anchor="middle" class="title ui" font-size="11">Sad</text>
+      </g>
+    </g>
+    <!-- chart panel -->
+    <rect x="0" y="293" width="460" height="235" rx="17" class="panel"/>
+    <text x="20" y="321" class="title ui" font-size="13" font-weight="700">Mood over time</text>
+    <text x="20" y="339" class="copy" font-size="10">A gentle look at your recent patterns</text>
+    <g stroke="#dce5ff" stroke-opacity=".08">
+      <path d="M22 378H437M22 420H437M22 462H437M22 504H437"/>
+      <path d="M48 365V505M122 365V505M196 365V505M270 365V505M344 365V505M418 365V505"/>
+    </g>
+    <path d="M28 463 C60 440 75 448 101 426 S148 448 175 411 S224 431 250 399 S300 421 327 385 S375 405 429 374" fill="none" stroke="#8b80ff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M28 463 C60 440 75 448 101 426 S148 448 175 411 S224 431 250 399 S300 421 327 385 S375 405 429 374 L429 505 L28 505Z" fill="url(#violet)" opacity=".11"/>
+    <g fill="#c6c0ff" stroke="#171a32" stroke-width="3"><circle cx="28" cy="463" r="5"/><circle cx="101" cy="426" r="5"/><circle cx="175" cy="411" r="5"/><circle cx="250" cy="399" r="5"/><circle cx="327" cy="385" r="5"/><circle cx="429" cy="374" r="5"/></g>
+    <g class="copy" font-size="9" text-anchor="middle"><text x="48" y="519">MON</text><text x="122" y="519">TUE</text><text x="196" y="519">WED</text><text x="270" y="519">THU</text><text x="344" y="519">FRI</text><text x="418" y="519">SAT</text></g>
+    <!-- wellness score panel -->
+    <rect x="475" y="293" width="270" height="235" rx="17" class="panel"/>
+    <text x="495" y="321" class="title ui" font-size="13" font-weight="700">Harmony balance</text>
+    <text x="495" y="340" class="copy" font-size="10">A reflection of your activity</text>
+    <circle cx="610" cy="420" r="59" fill="none" stroke="#e1e7ff" stroke-opacity=".07" stroke-width="10"/>
+    <circle cx="610" cy="420" r="59" fill="none" stroke="url(#warm)" stroke-width="10" stroke-linecap="round" stroke-dasharray="255 371" transform="rotate(-90 610 420)"/>
+    <text x="610" y="417" text-anchor="middle" class="title ui" font-size="27" font-weight="700">78%</text>
+    <text x="610" y="438" text-anchor="middle" class="copy" font-size="9">ILLUSTRATIVE</text>
+    <text x="495" y="503" class="copy" font-size="10">Mood · Habits · Journal</text>
+    <!-- bottom cards -->
+    <rect x="0" y="544" width="460" height="170" rx="17" class="panel"/>
+    <text x="20" y="573" class="title ui" font-size="13" font-weight="700">Today's gentle momentum</text>
+    <text x="20" y="592" class="copy" font-size="10">Small routines, practiced with kindness.</text>
+    <g transform="translate(20 610)">
+      <circle cx="11" cy="11" r="10" fill="#10b981" fill-opacity=".18" stroke="#6ee7b7" stroke-opacity=".6"/><path d="M6 11l3 3 7-7" stroke="#6ee7b7" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <text x="31" y="15" class="title ui" font-size="11">Morning stretch</text><text x="420" y="15" class="copy" font-size="10" text-anchor="end">COMPLETED</text>
+      <path d="M0 29H420" stroke="#fff" stroke-opacity=".06"/>
+      <circle cx="11" cy="49" r="10" fill="#fff" fill-opacity=".035" stroke="#fff" stroke-opacity=".16"/>
+      <text x="31" y="53" class="title ui" font-size="11">Read for ten minutes</text><text x="420" y="53" class="copy" font-size="10" text-anchor="end">NEXT STEP</text>
+    </g>
+    <rect x="475" y="544" width="270" height="170" rx="17" fill="#141c2e" stroke="#dce5ff" stroke-opacity=".095"/>
+    <circle cx="610" cy="635" r="72" fill="url(#glow)"/>
+    <g transform="translate(564 574)">
+      <path d="M46 94V52" stroke="#6ee7b7" stroke-width="3" stroke-linecap="round"/>
+      <path d="M46 67C16 66 17 37 17 37C39 36 50 49 46 67Z" fill="#10b981" fill-opacity=".8" stroke="#6ee7b7" stroke-opacity=".8"/>
+      <path d="M46 54C44 27 70 21 70 21C73 42 60 54 46 54Z" fill="#34d399" fill-opacity=".85" stroke="#6ee7b7" stroke-opacity=".7"/>
+      <path d="M26 95H66" stroke="#d1b47c" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <text x="610" y="686" text-anchor="middle" class="title ui" font-size="12" font-weight="700">Memory Garden</text>
+    <text x="610" y="702" text-anchor="middle" class="copy" font-size="9">Small wins, taking root</text>
+  </g>
+</svg>
